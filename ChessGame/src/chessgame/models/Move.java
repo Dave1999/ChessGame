@@ -5,7 +5,7 @@
  */
 package chessgame.models;
 
-import chessgame.models.Game.TeamColors;
+import chessgame.models.Game.TeamColor;
 import chessgame.models.Piece.PieceType;
 
 /**
@@ -14,12 +14,12 @@ import chessgame.models.Piece.PieceType;
  */
 public class Move 
 {
-    private final TeamColors Team;
+    private final TeamColor Team;
     private final PieceType Type; 
     private final BoardLocation StartLocation;
     private final BoardLocation EndLocation;
     
-    public Move(TeamColors team, PieceType type, BoardLocation start, BoardLocation end)
+    public Move(TeamColor team, PieceType type, BoardLocation start, BoardLocation end)
     {
         this.Team = team;
         this.Type = type;
@@ -27,7 +27,7 @@ public class Move
         this.EndLocation = end;
     }
     
-    public TeamColors getTeam()
+    public TeamColor getTeam()
     {
         return this.Team;
     }
@@ -45,5 +45,10 @@ public class Move
     public BoardLocation getEndLocation()
     {
         return this.EndLocation;
+    }
+    
+    public String toString()
+    {
+        return "";
     }
 }

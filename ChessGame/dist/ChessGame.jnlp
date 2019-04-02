@@ -8,9 +8,11 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="ChessGame.jar" size="10625" download="eager" />
+    <jar href="ChessGame.jar" size="10361" download="eager" />
   </resources>
-  <application-desc main-class="chessgame.ChessGame"  name="ChessGame" >
-  </application-desc>
+  <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="ChessGame" >
+    <param name="requiredFXVersion" value="8.0+"/>
+  </applet-desc>
+  <jfx:javafx-desc  width="800" height="600" main-class="chessgame.MainWindow"  name="ChessGame" />
   <update check="always"/>
 </jnlp>

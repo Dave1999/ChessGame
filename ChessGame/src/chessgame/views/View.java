@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package chessgame.models;
+
+package chessgame.views;
 
 /**
  *
  * @author David
  */
-public class Board 
-{
-
+public interface View {
+    public void Display(chessgame.models.Move m);
 }
