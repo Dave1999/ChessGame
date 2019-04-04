@@ -18,8 +18,9 @@ import javafx.scene.layout.StackPane;
 
 public class GameController extends javafx.scene.layout.StackPane
 {
-    ImageManager images;
-    Game game;
+    private ImageManager images;
+    private Game game;
+    private boolean IsPieceSelected;
     
     public GameController() 
     {
@@ -35,6 +36,11 @@ public class GameController extends javafx.scene.layout.StackPane
         }
     }
      
+    public void PieceButton_Click()
+    {
+        // If a piece is already selected, 
+    }
+    
     public void Display()
     { 
         /*

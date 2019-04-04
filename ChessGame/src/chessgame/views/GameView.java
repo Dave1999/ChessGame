@@ -11,7 +11,7 @@ import javafx.scene.layout.StackPane;
  *
  * @author David
  */
-public class GameView extends StackPane implements View
+public class GameView extends StackPane implements IView
 {
     // This class extends StackPane, and displays a List of move. Display adds a Move object to the list,
     // and displays it in the list-view.

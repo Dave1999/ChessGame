@@ -26,11 +26,11 @@ public class BoardLocation {
        Column = column;
     }
     
-    public int getBoardRow(){
+    public int getRow(){
         return Row;
     }
 
-    public int getBoardColumn() {
+    public int getColumn() {
         return Column;
     }
 }
