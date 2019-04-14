@@ -7,13 +7,39 @@ package chessgame.models;
 
 /**
  *
- * @author David
+ * @author Dalton
  */
-public class Rook extends Piece
-{
-    @Override
-    public Boolean IsMovePatternValid(BoardLocation current, BoardLocation end) 
+public class Rook extends Piece {
+
+    public Rook(TeamColor color)
     {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        super(color);
+        this.PieceType = PieceType.Rook;
+    }
+    
+    /*
+    The Rook isMovePatternValid check only checks to make sure the End Location
+    is in the same row or the same column as the starting location and also checks
+    the intial checks from Piece.
+    */
+    @Override
+    public boolean isMovePatternValid(int rowStart, int colStart, int rowEnd, int colEnd)
+    {
+        if(super.isMovePatternValid(rowStart, colStart, rowEnd, colEnd) == false)
+        {
+            return false;
+        }
+        
+         //Checks to make sure the rowEnd or colEnd is the Same as starting location
+        else if((rowEnd==rowStart) || (colEnd==colStart))
+        {
+            return true;
+        }
+        
+        //Default return of false
+        else
+        {
+            return false;
+        }
     }
 }

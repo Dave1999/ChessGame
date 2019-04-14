@@ -22,6 +22,7 @@ public class BoardLocation {
            throw new BoardLocationException("Error, Row not on board");
        if((column >= MAX_HIGHT)||(column < 0))
            throw new BoardLocationException("Error, Column not on board");
+       
        Row = row;
        Column = column;
     }

@@ -6,6 +6,11 @@
 package chessgame.views;
 
 import javafx.scene.layout.StackPane;
+import chessgame.models.Move;
+import java.util.ArrayList;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.ListView;
 
 /**
  *
@@ -13,10 +18,20 @@ import javafx.scene.layout.StackPane;
  */
 public class GameView extends StackPane implements IView
 {
+    private ListView<String> MoveListView;
+    
     // This class extends StackPane, and displays a List of move. Display adds a Move object to the list,
     // and displays it in the list-view.
-    public void Display(chessgame.models.Move move)
+    
+    public GameView()
     {
-        
+        super();
+        MoveListView = new ListView<>();
+    }
+    
+    @Override
+    public void Display(Move move)
+    {
+        MoveListView.getItems().add(move.toString());
     }
 }

@@ -6,57 +6,49 @@
 package chessgame.models;
 
 import chessgame.models.Piece.PieceType;
-import chessgame.models.Game.TeamColor;
-import static chessgame.models.Game.TeamColor.Black;
-import static chessgame.models.Game.TeamColor.White;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
+import chessgame.models.Piece.TeamColor;
+import static chessgame.models.Piece.TeamColor.Black;
+import static chessgame.models.Piece.TeamColor.White;
+import javafx.scene.image.Image;
 
 /**
  *
  * @author grady
  */
 
-
 public class ImageManager 
 {
-    BufferedImage whiteKing;
-    BufferedImage blackKing;
-    BufferedImage whiteQueen;
-    BufferedImage blackQueen;
-    BufferedImage whiteBishop;
-    BufferedImage blackBishop;
-    BufferedImage whiteRook;
-    BufferedImage blackRook;
-    BufferedImage whiteKnight;
-    BufferedImage blackKnight;
-    BufferedImage whitePawn;
-    BufferedImage blackPawn;
+    Image whiteKing;
+    Image blackKing;
+    Image whiteQueen;
+    Image blackQueen;
+    Image whiteBishop;
+    Image blackBishop;
+    Image whiteRook;
+    Image blackRook;
+    Image whiteKnight;
+    Image blackKnight;
+    Image whitePawn;
+    Image blackPawn;
     
-    BufferedImage image;
-    Graphics g;
-    
-    public ImageManager() throws IOException {
-        
-        whiteKing = ImageIO.read(new File("/White King.png"));
-        whiteQueen = ImageIO.read(new File("/White Queen.png"));
-        whiteBishop = ImageIO.read(new File("/White Bishop.png"));
-        whiteRook = ImageIO.read(new File("/White Rook.png"));
-        whiteKnight = ImageIO.read(new File("/White Knight.png"));
-        whitePawn = ImageIO.read(new File("/White Pawn.png"));
+    public ImageManager() 
+    {
+        whiteKing = new Image(getClass().getResourceAsStream("/Images/White King.png"));
+        whiteQueen = new Image(getClass().getResourceAsStream("/Images/White Queen.png"));
+        whiteBishop = new Image(getClass().getResourceAsStream("/Images/White Bishop.png"));
+        whiteRook = new Image(getClass().getResourceAsStream("/Images/White Rook.png"));
+        whiteKnight = new Image(getClass().getResourceAsStream("/Images/White Knight.png"));
+        whitePawn = new Image(getClass().getResourceAsStream("/Images/White Pawn.png"));
 
-        blackKing = ImageIO.read(new File("/Black King.png"));
-        blackQueen = ImageIO.read(new File("/Black Queen.png"));
-        blackBishop = ImageIO.read(new File("/Black Bishop.png"));
-        blackRook = ImageIO.read(new File("/Black Rook.png"));
-        blackKnight = ImageIO.read(new File("/Black Knight.png"));
-        blackPawn = ImageIO.read(new File("/Black Pawn.png"));
+        blackKing = new Image(getClass().getResourceAsStream("/Images/Black King.png"));
+        blackQueen = new Image(getClass().getResourceAsStream("/Images/Black Queen.png"));
+        blackBishop = new Image(getClass().getResourceAsStream("/Images/Black Bishop.png"));
+        blackRook = new Image(getClass().getResourceAsStream("/Images/Black Rook.png"));
+        blackKnight = new Image(getClass().getResourceAsStream("/Images/Black Knight.png"));
+        blackPawn = new Image(getClass().getResourceAsStream("/Images/Black Pawn.png"));
     }
     
-    public BufferedImage getImage(TeamColor pieceColor, PieceType pieceType) {
+    public Image getImage(TeamColor pieceColor, PieceType pieceType) {
         
         switch(pieceType) {
             case Pawn:
@@ -127,5 +119,6 @@ public class ImageManager
         
         return null;
     }
+   
 }
    

@@ -5,32 +5,73 @@
  */
 package chessgame.models;
 
-import chessgame.models.Game.TeamColor;
-
 /**
  *
- * @author David
+ * @author Dalton
  */
-public abstract class Piece 
+public class Piece 
 {
-    public enum PieceType { King, Queen, Bishop, Rook, Knight, Pawn };
-    
-    public PieceType Type;
-    public TeamColor Color;
-    
-    public Piece()
+    public enum PieceType
     {
+        Rook, Bishop, King, Queen, Pawn, Knight
+    }
+     
+    public enum TeamColor
+    {
+       Black, White
+    }
+     
+    protected PieceType PieceType;  
+    protected TeamColor PieceColor;
+     
+    public Piece(TeamColor color)
+    {
+        PieceColor = color;
+    }
+     
+    public Piece(PieceType pieceType, TeamColor color)
+    {
+        PieceType = pieceType;
+        PieceColor = color;
     }
     
-    public abstract Boolean IsMovePatternValid(BoardLocation current, BoardLocation end);
-    
-    public PieceType getType()
-    {
-        return Type;
-    }
-    
+    // Returns the Color of the Piece
     public TeamColor getColor()
     {
-        return Color;
+        return PieceColor;
+    }
+    
+    //Returns the Piece Type
+    public PieceType getType()
+    {
+         return PieceType;
+    }
+    
+    //Temporary Function created for removing a piece from a square
+    public void SpaceDeletion(Piece [][] tmp, int rowStart,int colStart )
+    {
+        tmp[rowStart][colStart]=null;
+    }
+
+    /*The is MoveValidPattern function present in Piece makes some intial checks
+    to make sure the piece is not trying to move to its current space or it is not
+    trying to move to a space that is out of bounds.The isMovePatternValid takes an
+    input of the current location of the piece in two coordinates the row and col
+    along with the ending location in two coordinates for row and column.
+    */
+    public boolean isMovePatternValid(int rowStart, int colStart, int rowEnd, int colEnd)
+    {
+        if(rowStart==rowEnd&&colStart==colEnd)
+        {
+            return false;
+        }
+        else if(rowEnd<0||rowEnd>7||colEnd<0||colEnd>7)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 }

@@ -1,6 +1,7 @@
 package chessgame.models;
 
 import java.util.ArrayList;
+import chessgame.models.Piece.TeamColor;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -14,10 +15,8 @@ import java.util.ArrayList;
  */
 public class Game 
 {  
-    public enum TeamColor { White, Black };
-
-    private final int BOARD_HEIGHT = 8;
-    private final int BOARD_WIDTH = 8;
+    public static final int BOARD_HEIGHT = 8;
+    public static final int BOARD_WIDTH = 8;
     
     private Piece[][] m_Pieces;
     private int TurnCount;
@@ -27,8 +26,6 @@ public class Game
     public Game()
     {
         this.m_Pieces = new Piece[BOARD_HEIGHT][BOARD_WIDTH];
-        
-        InitializeGameState();
     }
     
     /** 
@@ -36,9 +33,55 @@ public class Game
      * placing them where they belong.
      */
     // Initializes the game board to the d
-    public void InitializeGameState()
+    public final void InitializeGameState()
     {
+        this.TurnIndicator = TeamColor.White;
         
+        this.CreatePieces();
+    }
+    
+    private void CreatePieces()
+    {
+         // Construct the game board, starting at (0, 0) (the top left corner) and progressing downward.
+        // Black back row.
+        this.m_Pieces[0][0] = new Rook(TeamColor.Black);
+        this.m_Pieces[0][1] = new Knight(TeamColor.Black);
+        this.m_Pieces[0][2] = new Bishop(TeamColor.Black);
+        this.m_Pieces[0][3] = new Queen(TeamColor.Black);
+        this.m_Pieces[0][4] = new King(TeamColor.Black);
+        this.m_Pieces[0][5] = new Bishop(TeamColor.Black);
+        this.m_Pieces[0][6] = new Knight(TeamColor.Black);
+        this.m_Pieces[0][7] = new Rook(TeamColor.Black);
+        
+        // Black front row - pawns.
+        this.m_Pieces[1][0] = new Pawn(TeamColor.Black);
+        this.m_Pieces[1][1] = new Pawn(TeamColor.Black);
+        this.m_Pieces[1][2] = new Pawn(TeamColor.Black);
+        this.m_Pieces[1][3] = new Pawn(TeamColor.Black);
+        this.m_Pieces[1][4] = new Pawn(TeamColor.Black);
+        this.m_Pieces[1][5] = new Pawn(TeamColor.Black);
+        this.m_Pieces[1][6] = new Pawn(TeamColor.Black);
+        this.m_Pieces[1][7] = new Pawn(TeamColor.Black);
+        
+        // White front row - pawns.
+        this.m_Pieces[6][0] = new Pawn(TeamColor.White);
+        this.m_Pieces[6][1] = new Pawn(TeamColor.White);
+        this.m_Pieces[6][2] = new Pawn(TeamColor.White);
+        this.m_Pieces[6][3] = new Pawn(TeamColor.White);
+        this.m_Pieces[6][4] = new Pawn(TeamColor.White);
+        this.m_Pieces[6][5] = new Pawn(TeamColor.White);
+        this.m_Pieces[6][6] = new Pawn(TeamColor.White);
+        this.m_Pieces[6][7] = new Pawn(TeamColor.White);
+        
+        // White back row.
+        this.m_Pieces[7][0] = new Rook(TeamColor.White);
+        this.m_Pieces[7][1] = new Knight(TeamColor.White);
+        this.m_Pieces[7][2] = new Bishop(TeamColor.White);
+        this.m_Pieces[7][3] = new Queen(TeamColor.White);
+        this.m_Pieces[7][4] = new King(TeamColor.White);
+        this.m_Pieces[7][5] = new Bishop(TeamColor.White);
+        this.m_Pieces[7][6] = new Knight(TeamColor.White);
+        this.m_Pieces[7][7] = new Rook(TeamColor.White);
     }
     
     public void UpdateTurn()
@@ -94,7 +137,12 @@ public class Game
                         continue;
                     }
                     
-                    boolean isPatternValid = selectedPiece.IsMovePatternValid(selectedLocation, targetLocation); 
+                    boolean isPatternValid = selectedPiece.isMovePatternValid(
+                            selectedLocation.getRow(), 
+                            selectedLocation.getColumn(), 
+                            targetLocation.getRow(), 
+                            targetLocation.getColumn()); 
+                    
                     if (!isPatternValid)
                     {
                         continue;// Check if there are any obstacles.
@@ -108,8 +156,6 @@ public class Game
                     
                     // If the function makes it to this point, the move is valid, and can be added
                     // to the list of potential moves.
-                    
-                    
                 }
             }
             

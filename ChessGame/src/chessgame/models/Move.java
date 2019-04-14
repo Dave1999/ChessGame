@@ -5,7 +5,7 @@
  */
 package chessgame.models;
 
-import chessgame.models.Game.TeamColor;
+import chessgame.models.Piece.TeamColor;
 import chessgame.models.Piece.PieceType;
 
 /**
