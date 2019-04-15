@@ -33,7 +33,7 @@ public class Queen extends Piece
         }
         
         //The Check for same row and col as starting position (Rook Check)
-        else if((rowEnd==rowStart) || (colEnd==colStart))
+        else if((rowEnd == rowStart) || (colEnd == colStart))
         {
              return true;
         }

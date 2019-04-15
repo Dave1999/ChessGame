@@ -41,47 +41,53 @@ public class Pawn extends Piece
         else if(this.getColor() == TeamColor.White)
         {
             //Checks the tile in front of the Pawn
-            if(colEnd==colStart&&rowEnd==rowStart+1){
+            if(colEnd == colStart && rowEnd == rowStart - 1){
                 return true;
             }
             //Returns true if the pawn is on its first move and the end tile is 2 movement away
-            else if(colEnd==colStart&&rowEnd==rowStart+2&&rowStart==1)
+            else if(colEnd == colStart && rowEnd == rowStart-2 && rowStart == 6)
             {   
                 return true;
             }
+            
             //This checks returns true for the diagonal tile on the right side of the pawn.
             if(colEnd==colStart+1&&rowEnd==rowStart+1){
                 return true;
             }
+            
             //This check returns true for the diagonal tile on the left side of the pawn
-            else if(colEnd==colStart-1&&rowEnd==rowStart+1){
+            else if(colEnd==colStart-1&&rowEnd==rowStart+1)
+            {
                 return true;
             }
+            
             //If none of these checks fit for the white Piece defaults to false
-            else{
+            else
+            {
                 return false;
             }
         }
+        
         //Checks to see if the pawn is teamcolor black
         else if(this.getColor() == TeamColor.Black)
         {
             //Checks to see if the Piece is one tile in front of the black Piece
-            if(colEnd==colStart&&rowEnd==rowStart-1)
+            if ((colEnd == colStart) && (rowEnd == (rowStart + 1)))
             {
                 return true;
             }
             //Returns true if the space is 2 in front of the black piece and it hasnt moved
-            else if(colEnd==colStart&&rowEnd==rowStart-2&&rowStart==6)
+            else if ((colEnd == colStart) && (rowEnd == (rowStart + 2)) && (rowStart == 1))
             {
                 return true;
             }
             //Returns true if the tile is diagonal down and left of the black Piece
-            else if(colEnd==colStart-1&&rowEnd==rowStart-1)
+            else if ((colEnd == (colStart - 1)) && (rowEnd == (rowStart - 1)))
             {
                 return true;
             }
             //Returns true if the tile is diagonal down and right of the black Piece
-            else if(colEnd==colStart+1&&rowEnd==rowStart-1)
+            else if((colEnd == colStart + 1) && (rowEnd == rowStart - 1))
             {
                 return true;
             }

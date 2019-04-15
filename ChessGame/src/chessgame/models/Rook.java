@@ -31,7 +31,7 @@ public class Rook extends Piece {
         }
         
          //Checks to make sure the rowEnd or colEnd is the Same as starting location
-        else if((rowEnd==rowStart) || (colEnd==colStart))
+        else if((rowEnd == rowStart) || (colEnd == colStart))
         {
             return true;
         }

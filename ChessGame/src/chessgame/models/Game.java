@@ -25,6 +25,7 @@ public class Game
     
     public Game()
     {
+        this.Moves = new ArrayList<Move>();
         this.m_Pieces = new Piece[BOARD_HEIGHT][BOARD_WIDTH];
     }
     
@@ -127,35 +128,12 @@ public class Game
             {
                 for (int j = 0; j < BOARD_WIDTH; j++)
                 {
-                    // First, check if the space is occupied by a piece of the same color.
-
                     BoardLocation targetLocation = new BoardLocation(i, j);
                        
-                    boolean isOccupiedByTeam = this.getPieceAt(targetLocation).getColor() == TurnIndicator;
-                    if (isOccupiedByTeam)
+                    if (isMoveValid(selectedLocation, selectedPiece, targetLocation))
                     {
-                        continue;
+                        availableMoves.add(targetLocation);
                     }
-                    
-                    boolean isPatternValid = selectedPiece.isMovePatternValid(
-                            selectedLocation.getRow(), 
-                            selectedLocation.getColumn(), 
-                            targetLocation.getRow(), 
-                            targetLocation.getColumn()); 
-                    
-                    if (!isPatternValid)
-                    {
-                        continue;// Check if there are any obstacles.
-                    }
-                    
-                    boolean areThereObstacles = true;
-                    if (areThereObstacles)
-                    {
-                        continue;
-                    }
-                    
-                    // If the function makes it to this point, the move is valid, and can be added
-                    // to the list of potential moves.
                 }
             }
             
@@ -167,13 +145,69 @@ public class Game
         }                
     }
     
-    public void PerformMove(BoardLocation start, BoardLocation end)
+    public boolean isMoveValid(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation)
     {
-        Piece piece = this.getPieceAt(start);
+        // First, check if the space is occupied by a piece of the same color.
+        Piece pieceAtTarget = this.getPieceAt(targetLocation);
         
-        Move move = new Move(piece.getColor(), piece.getType(), start, end);
-        this.Moves.add(move);
+        if (pieceAtTarget != null)
+        {
+            if (pieceAtTarget.getColor() == TurnIndicator)
+            {
+                return false;
+            }
+        }
+        
+        if (selectedPiece.getColor() != TurnIndicator)
+        {
+            return false;
+        }
 
-        //this.getPieceAt(start)
+        boolean isPatternValid = selectedPiece.isMovePatternValid(
+                selectedLocation.getRow(), 
+                selectedLocation.getColumn(), 
+                targetLocation.getRow(), 
+                targetLocation.getColumn()); 
+
+        // Temporary hack for testing!
+        return isPatternValid;
+        /*
+        if (!isPatternValid)
+        {
+            return false;
+        }
+
+        boolean areThereObstacles = true;
+        
+        if (areThereObstacles)
+        {
+            return false;
+        }
+
+        // If the function makes it to this point, the move is valid.
+        return true;
+        */
+    }
+    
+    public boolean PerformMove(BoardLocation start, BoardLocation end)
+    {
+        Piece selectedPiece = this.getPieceAt(start);
+        
+        if (isMoveValid(start, selectedPiece, end))
+        {
+            this.setPieceAt(start, null);
+            this.setPieceAt(end, selectedPiece);
+            
+            Move move = new Move(selectedPiece.getColor(), selectedPiece.getType(), start, end);
+            this.Moves.add(move);
+
+            //this.getPieceAt(start)
+            this.UpdateTurn();
+            return true;
+        }
+        else 
+        {
+            return false;
+        }
     }
 }

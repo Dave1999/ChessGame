@@ -45,7 +45,7 @@ public class MainWindow extends Application
         
         StackPane root = new StackPane();
         root.getChildren().add(controller);
-        root.getChildren().add(view);
+        //root.getChildren().add(view);
         
         Scene scene = new Scene(root, 300, 250);
         

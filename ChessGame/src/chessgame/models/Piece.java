@@ -47,12 +47,6 @@ public class Piece
          return PieceType;
     }
     
-    //Temporary Function created for removing a piece from a square
-    public void SpaceDeletion(Piece [][] tmp, int rowStart,int colStart )
-    {
-        tmp[rowStart][colStart]=null;
-    }
-
     /*The is MoveValidPattern function present in Piece makes some intial checks
     to make sure the piece is not trying to move to its current space or it is not
     trying to move to a space that is out of bounds.The isMovePatternValid takes an
@@ -61,11 +55,11 @@ public class Piece
     */
     public boolean isMovePatternValid(int rowStart, int colStart, int rowEnd, int colEnd)
     {
-        if(rowStart==rowEnd&&colStart==colEnd)
+        if((rowStart == rowEnd) && (colStart == colEnd))
         {
             return false;
         }
-        else if(rowEnd<0||rowEnd>7||colEnd<0||colEnd>7)
+        else if((rowEnd < 0) || (rowEnd > 7) || (colEnd < 0) || (colEnd > 7))
         {
             return false;
         }

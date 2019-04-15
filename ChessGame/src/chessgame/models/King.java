@@ -26,39 +26,48 @@ public class King extends Piece
     @Override
      public boolean isMovePatternValid(int rowStart, int colStart, int rowEnd, int colEnd)
      {
-        if(super.isMovePatternValid(rowStart, colStart, rowEnd, colEnd)==false){
+        if(super.isMovePatternValid(rowStart, colStart, rowEnd, colEnd) == false)
+        {
             return false;
         }
         //Returns true for tile in front of the king
-        else if(colEnd == colStart && rowEnd == rowStart+1){
+        else if((colEnd == colStart) && (rowEnd == (rowStart + 1)))
+        {
             return true;
         }
         //Returns true for tile behind the king
-        else if(colEnd==colStart && rowEnd == rowStart-1){
+        else if((colEnd == colStart) && (rowEnd == (rowStart - 1)))
+        {
             return true;
         }
         //Returns true for tile to the right of the king
-        else if(colEnd==colEnd+1&&rowEnd==rowStart){
+        else if((colEnd == (colEnd + 1)) && (rowEnd == rowStart))
+        {
             return true;
         }
         //Returns true for the tile to the left of the king
-        else if(colEnd==colStart-1&&rowEnd==rowStart){
+        else if((colEnd == (colStart - 1)) && (rowEnd == rowStart))
+        {
             return true;
         }
         //Returns true for the tile diagonal up left of the king
-        else if(colEnd==colStart-1&&rowEnd==rowStart+1){
+        else if((colEnd == (colStart - 1)) && (rowEnd == (rowStart + 1)))
+        {
             return true;
         }
         //Returns true for tile diagonal down left of king
-        else if(colEnd==colStart-1&&rowEnd==rowStart-1){
+        else if((colEnd == (colStart - 1)) && (rowEnd == (rowStart - 1)))
+        {
             return true;
         }
         //Returns true for tile diagonal up right of the king
-        else if(colEnd==colStart+1&&rowEnd==rowStart+1){
+        else if((colEnd == (colStart + 1)) && (rowEnd == (rowStart + 1)))
+        {
             return true;
         }
         //returns true for tile diagonal down right of the king
-        else if(colEnd==colStart+1&&rowEnd==rowStart-1){
+        else if((colEnd == (colStart + 1)) && (rowEnd == (rowStart - 1)))
+        {
             return true;
         }
         //Default return if no flag was triggered
