@@ -3,15 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-package chessgame.views;
+package chessgame.exceptions;
 
 /**
  *
- * @author David
+ * @author samuel
  */
-public interface IView 
+public class ObstacleCheckException extends RuntimeException 
 {
-    public void SetGame(chessgame.models.Game g);
-    public void Display();
+    public ObstacleCheckException(String msg) 
+    {
+        super(msg);
+    }
 }

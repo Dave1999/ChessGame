@@ -3,15 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-package chessgame.views;
+package chessgame.exceptions;
 
 /**
  *
  * @author David
  */
-public interface IView 
+public class WrongTurnException extends Exception 
 {
-    public void SetGame(chessgame.models.Game g);
-    public void Display();
+    public WrongTurnException(String msg) 
+    {
+        super(msg);
+    }
 }

@@ -1,5 +1,9 @@
 package chessgame.models;
 
+import chessgame.exceptions.ObstacleCheckException;
+import static chessgame.models.Piece.PieceType.King;
+import static chessgame.models.Piece.PieceType.Knight;
+import static chessgame.models.Piece.PieceType.Pawn;
 import java.util.ArrayList;
 import chessgame.models.Piece.TeamColor;
 
@@ -22,11 +26,14 @@ public class Game
     private int TurnCount;
     private TeamColor TurnIndicator;
     private ArrayList<Move> Moves; 
-    
+    private ArrayList<BoardLocation> ValidMoves;
+
     public Game()
     {
-        this.Moves = new ArrayList<Move>();
+        this.Moves = new ArrayList<>();
         this.m_Pieces = new Piece[BOARD_HEIGHT][BOARD_WIDTH];
+        
+        // The turn count will be incremented after the first turn is played.
     }
     
     /** 
@@ -37,13 +44,22 @@ public class Game
     public final void InitializeGameState()
     {
         this.TurnIndicator = TeamColor.White;
-        
+        this.TurnCount = 0;
         this.CreatePieces();
     }
     
     private void CreatePieces()
     {
-         // Construct the game board, starting at (0, 0) (the top left corner) and progressing downward.
+        // Start out by initializing the pieces to all empty, in case the Game object is being reused.
+        for (int i = 0; i < BOARD_WIDTH; i++)
+        {
+            for (int k = 0; k < BOARD_HEIGHT; k++)
+            {
+                this.m_Pieces[i][k] = null;
+            }
+        }
+        
+        // Construct the game board, starting at (0, 0) (the top left corner) and progressing downward.
         // Black back row.
         this.m_Pieces[0][0] = new Rook(TeamColor.Black);
         this.m_Pieces[0][1] = new Knight(TeamColor.Black);
@@ -89,14 +105,14 @@ public class Game
     {
         if (this.TurnIndicator == TeamColor.Black)
         {
-            this.TurnCount++;
             this.TurnIndicator = TeamColor.White;
         }
         else 
         {
+            this.TurnCount++;
             this.TurnIndicator = TeamColor.Black; 
         }
-    }
+    }     
     
     public Piece[][] getPieces() 
     {
@@ -108,22 +124,46 @@ public class Game
         return m_Pieces[location.getRow()][location.getColumn()];
     }
     
+    public boolean isSpaceEmpty(BoardLocation location)
+    {
+        return (getPieceAt(location) == null);
+    }
+    
     public void setPieceAt(BoardLocation location, Piece piece)
     {
         m_Pieces[location.getRow()][location.getColumn()] = piece;
     }
     
+    public TeamColor getTurnIndicator()
+    {
+        return this.TurnIndicator;
+    }
+    
+    public int getTurnCount()
+    {
+        return this.TurnCount;
+    }
+
+    public Move getLastMove()
+    {
+        if (this.Moves.isEmpty())
+        {
+            return null;
+        }
+        else 
+        {
+            return this.Moves.get(this.Moves.size() - 1);
+        }
+    }
+    
     public ArrayList<BoardLocation> getAvailableMoves(BoardLocation selectedLocation)
     {
         ArrayList<BoardLocation> availableMoves = new ArrayList<BoardLocation>();
-        
         Piece selectedPiece = this.getPieceAt(selectedLocation);
         
         // Only permit the move if the piece is of the correct color.
         if (selectedPiece.getColor() == TurnIndicator)
         {
-            BoardLocation[] locations = null;
-            
             for (int i = 0; i < BOARD_HEIGHT; i++)
             {
                 for (int j = 0; j < BOARD_WIDTH; j++)
@@ -137,6 +177,7 @@ public class Game
                 }
             }
             
+            this.ValidMoves = availableMoves;
             return availableMoves;
         }
         else 
@@ -168,32 +209,352 @@ public class Game
                 selectedLocation.getColumn(), 
                 targetLocation.getRow(), 
                 targetLocation.getColumn()); 
-
-        // Temporary hack for testing!
-        return isPatternValid;
-        /*
+        
         if (!isPatternValid)
         {
             return false;
         }
-
-        boolean areThereObstacles = true;
         
-        if (areThereObstacles)
+        return !areThereObstacles(selectedLocation, selectedPiece, targetLocation);
+    }
+
+/*
+    private boolean areThereObstacles(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation) 
+    {
+          if (selectedPiece.getType() == Knight || selectedPiece.getType() == King)
+            return false;
+        
+        int rowStart = selectedLocation.getRow();
+        int colStart = selectedLocation.getColumn();
+        int rowEnd = targetLocation.getRow();
+        int colEnd = targetLocation.getColumn();
+        
+        int i = rowStart;
+        int k = colStart;
+        boolean homeSpace = true; //This is used to make sure the piece doesn't think it's blocking itself
+        
+        //Horizontal move
+        if (rowStart == rowEnd)
+        {
+            if (colStart > colEnd) 
+            {
+                //Movement left
+                while (k > colEnd)
+                {
+                    if (homeSpace == true) 
+                    {
+                        homeSpace = false;
+                        k--;
+                        continue;
+                    }
+                    else if (this.m_Pieces[i][k] == null){}
+                    else 
+                    {
+                        return true;
+                    }
+                    k--;
+                }
+                return false;
+            }
+            else if (colStart < colEnd) 
+            {
+                //Movement right
+                while (k < colEnd)
+                {
+                    if (homeSpace == true) 
+                    {
+                        homeSpace = false;
+                        k++;
+                        continue;
+                    }
+                    else if (this.m_Pieces[i][k] == null){}
+                    else 
+                    {
+                        return true;
+                    }
+                    k++;
+                }
+                return false;
+            }
+        }
+        
+        //Vertical move
+        else if (colStart == colEnd)
+        {
+            int incrementStart = Min(rowStart, rowEnd);
+            int incrementEnd = Max(rowStart, rowEnd);
+            
+            
+            if (rowStart > rowEnd)
+            {
+                //Movement up
+                while (i > rowEnd)
+                {
+                    if (homeSpace == true) 
+                    {
+                        homeSpace = false;
+                        i--;
+                        continue;
+                    }
+                    else if (this.m_Pieces[i][k] == null) {}
+                    else 
+                    {
+                        return true;
+                    }
+                    i--;
+                }
+                return false;
+            }
+            else if (rowStart < rowEnd)
+            {
+                //Movement down
+                while (i < rowEnd)
+                {
+                    if (homeSpace == true) 
+                    {
+                        homeSpace = false;
+                        i++;
+                        continue;
+                    }
+                    else if (this.m_Pieces[i][k] == null) {}
+                    else 
+                    {
+                        return true;
+                    }
+                    i++;
+                }
+                return false;
+            }
+        }
+    }
+    */
+    
+    // Returns false if no obstacles
+    private boolean areThereObstacles(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation) 
+    {
+        if (selectedPiece.getType() == Knight || selectedPiece.getType() == King)
         {
             return false;
         }
-
-        // If the function makes it to this point, the move is valid.
-        return true;
-        */
+   
+        int rowStart = selectedLocation.getRow();
+        int colStart = selectedLocation.getColumn();
+        int rowEnd = targetLocation.getRow();
+        int colEnd = targetLocation.getColumn();
+        
+        if (selectedPiece.getType() == Pawn)
+        {
+            if (colStart == colEnd)
+            {
+                // The move is vertical. Therefore, if there is a piece in front of the pawn, it is invalid.
+                if (!this.isSpaceEmpty(targetLocation))
+                {
+                    return true;
+                }
+            }
+            else 
+            {
+                // The move is diagonal. Therefore, there are "obstacles" to the pawn's progress if the 
+                // space is empty.
+                return this.isSpaceEmpty(targetLocation);
+            }
+        }
+        
+        int i = rowStart;
+        int k = colStart;
+        boolean homeSpace = true; //This is used to make sure the piece doesn't think it's blocking itself
+        
+        //Horizontal move
+        if (rowStart == rowEnd)
+        {
+            if (colStart > colEnd) 
+            {
+                //Movement left
+                while (k > colEnd)
+                {
+                    if (homeSpace == true) 
+                    {
+                        homeSpace = false;
+                        k--;
+                        continue;
+                    }
+                    else if (this.m_Pieces[i][k] == null){}
+                    else 
+                    {
+                        return true;
+                    }
+                    k--;
+                }
+                return false;
+            }
+            else if (colStart < colEnd) 
+            {
+                //Movement right
+                while (k < colEnd)
+                {
+                    if (homeSpace == true) 
+                    {
+                        homeSpace = false;
+                        k++;
+                        continue;
+                    }
+                    else if (this.m_Pieces[i][k] == null){}
+                    else 
+                    {
+                        return true;
+                    }
+                    k++;
+                }
+                return false;
+            }
+        }
+        
+        //Vertical move
+        else if (colStart == colEnd)
+        {
+            if (rowStart > rowEnd)
+            {
+                //Movement up
+                while (i > rowEnd)
+                {
+                    if (homeSpace == true) 
+                    {
+                        homeSpace = false;
+                        i--;
+                        continue;
+                    }
+                    else if (this.m_Pieces[i][k] == null) {}
+                    else 
+                    {
+                        return true;
+                    }
+                    i--;
+                }
+                return false;
+            }
+            else if (rowStart < rowEnd)
+            {
+                //Movement down
+                while (i < rowEnd)
+                {
+                    if (homeSpace == true) 
+                    {
+                        homeSpace = false;
+                        i++;
+                        continue;
+                    }
+                    else if (this.m_Pieces[i][k] == null) {}
+                    else 
+                    {
+                        return true;
+                    }
+                    i++;
+                }
+                return false;
+            }
+        }
+        
+        //Move is diagonal
+        else 
+        {
+            if (rowStart > rowEnd && colStart > colEnd)
+            {
+                //Movement northwest
+                while (i > rowEnd && k > colEnd)
+                {
+                    if (homeSpace == true) 
+                    {
+                        homeSpace = false;
+                        i--;
+                        k--;
+                        continue;
+                    }
+                    else if (this.m_Pieces[i][k] == null) {}
+                    else 
+                    {
+                        return true;
+                    }
+                    i--;
+                    k--;
+                }
+                return false;
+            }
+            else if (rowStart < rowEnd && colStart > colEnd)
+            {
+                //Movement southwest
+                while (i < rowEnd && k > colEnd)
+                {
+                    if (homeSpace == true) 
+                    {
+                        homeSpace = false;
+                        i++;
+                        k--;
+                        continue;
+                    }
+                    else if (this.m_Pieces[i][k] == null) {}
+                    else 
+                    {
+                        return true;
+                    }
+                    i++;
+                    k--;
+                }
+                return false;
+            }
+            else if (rowStart > rowEnd && colStart < colEnd)
+            {
+                //Movement northeast
+                while (i > rowEnd && k < colEnd)
+                {
+                    if (homeSpace == true) 
+                    {
+                        homeSpace = false;
+                        i--;
+                        k++;
+                        continue;
+                    }
+                    else if (this.m_Pieces[i][k] == null) {}
+                    else 
+                    {
+                        return true;
+                    }
+                    i--;
+                    k++;
+                }
+                return false;
+            }
+            else if (rowStart < rowEnd && colStart < colEnd)
+            {
+                //Movement southeast
+                while (i < rowEnd && k < colEnd)
+                {
+                    if (homeSpace == true) 
+                    {
+                        homeSpace = false;
+                        i++;
+                        k++;
+                        continue;
+                    }
+                    else if (this.m_Pieces[i][k] == null) {}
+                    else 
+                    {
+                        return true;
+                    }
+                    i++;
+                    k++;
+                }
+                return false;
+            }
+        }
+        throw new ObstacleCheckException("areThereObstacles() in class Game reached the end of the method without returning.");
     }
     
     public boolean PerformMove(BoardLocation start, BoardLocation end)
     {
         Piece selectedPiece = this.getPieceAt(start);
         
-        if (isMoveValid(start, selectedPiece, end))
+       // if (isMoveValid(start, selectedPiece, end))
+        if (ValidMoves.contains(end))
         {
             this.setPieceAt(start, null);
             this.setPieceAt(end, selectedPiece);
@@ -203,11 +564,20 @@ public class Game
 
             //this.getPieceAt(start)
             this.UpdateTurn();
+            
+            // Evaluate special moves.
+            EvaluateSpecialMoves();
+            
             return true;
         }
         else 
         {
             return false;
         }
+    }
+
+    private void EvaluateSpecialMoves()
+    {
+        // Check pawns, check, etc.
     }
 }

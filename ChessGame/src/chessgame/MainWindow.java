@@ -29,23 +29,14 @@ public class MainWindow extends Application
     @Override
     public void start(Stage primaryStage) 
     {
-        Button btn = new Button();
-        btn.setText("Say 'Hello World'");
-        btn.setOnAction(new EventHandler<ActionEvent>() {
-            
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("Hello World!");
-            }
-        });
-
         controller = new GameController();
         view = new GameView();
         controller.setView(view);
-        
+        controller.Display();
+
         StackPane root = new StackPane();
         root.getChildren().add(controller);
-        //root.getChildren().add(view);
+        root.getChildren().add(view);
         
         Scene scene = new Scene(root, 300, 250);
         
@@ -61,6 +52,9 @@ public class MainWindow extends Application
         primaryStage.setHeight(primaryScreenBounds.getHeight());
 
         primaryStage.show();
+        
+        //controller.setTranslateX(controller.getWidth() / 2);
+        view.setTranslateX(controller.getWidth() / 2);
     }
 
     /**

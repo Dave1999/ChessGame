@@ -5,12 +5,15 @@
  */
 package chessgame.controllers;
 
+import chessgame.exceptions.InvalidMoveException;
+import chessgame.exceptions.WrongTurnException;
+
 import chessgame.models.BoardLocation;
 import chessgame.models.Game;
 import chessgame.models.ImageManager;
 import chessgame.models.Piece;
 import chessgame.views.IView;
-import java.awt.Point;
+import java.util.ArrayList;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
@@ -29,6 +32,11 @@ public class GameController extends javafx.scene.layout.StackPane
 {
     private static final int BUTTONSIZE = 70;
     private static final int BUTTON_PADDING = 1;
+    
+    private final String WHITE_SQUARE_COLOR = "#4248f4";
+    private final String BLACK_SQUARE_COLOR = "#c42d0f"; 
+    private final String HIGHLIGHT_BORDER_COLOR = "#129b24";
+    private final String SELECTED_BORDER_COLOR = "#4f8ff7";
     
     // Models and views.
     private IView view;
@@ -77,60 +85,102 @@ public class GameController extends javafx.scene.layout.StackPane
 
         grid.setMouseTransparent(false);
         
-        // Initialize the game state, and display the empty game.
+        // Initialize the game state.
         this.game = new Game();
         game.InitializeGameState();
-        this.Display();
     }
 
+    /** 
+     * Event handler for the 
+     * @param event 
+     */
     public void PieceButton_Click(MouseEvent event)
     {
         try
         {
-                /*
-          Logic: 
-              Attempt to get the piece at the selected location.
-
-              If no piece is ALREADY selected (from the previous move), then:
-                  if the piece is null, do nothing
-                  if the piece is NOT the same color as the team whose turn it is, alert "not your turn"
-                  if the piece IS the correct color, select it and set IsPieceSelected to 'true'.
-
-              If a piece is already selected (IsPieceSelected == true), then attempt to perform the move.
-          */
-
-          Button clickedButton = (Button)event.getSource();
-          BoardLocation targetLocation = getButtonPosition(clickedButton);
+            Button clickedButton = (Button)event.getSource();
+            BoardLocation targetLocation = getButtonPosition(clickedButton);
           
-          // If a piece is already selected, 
-          if (IsPieceSelected)
-          {
-                // Attempt to move.
-                //boolean result = game.PerformMove(, selectedLocation);
+            // If a piece is already selected, 
+            if (IsPieceSelected)
+            {
+                /* If the piece that was clicked on is the same color as the piece that was 
+                   previously selected, then change the selected location to the location that was just 
+                   clicked on. */
+                if (targetLocation.equals(selectedLocation))
+                {
+                    return;
+                }
+                
+                Piece target = game.getPieceAt(targetLocation);
+                if ((target != null) && (target.getColor() == game.getTurnIndicator()))
+                {
+                    Display();
+                    setSelectedLocation(targetLocation);
+                    return;
+                }
+
+                // Otherwise, attempt to move the piece.
                 boolean result = game.PerformMove(selectedLocation, targetLocation);
 
-                if (!result)
-                {
-                      JOptionPane.showMessageDialog(null, "Invalid move! Please try a different option.", "InfoBox: " + "Invalid move", JOptionPane.INFORMATION_MESSAGE);
-                }
-                else 
+                // If the move worked, then re-display the board. Otherwise, show an error message. 
+                if (result)
                 {
                     this.Display();
                 }
-              
+                else 
+                {
+                    throw new InvalidMoveException("Invalid move.");
+                }
+
+                // After successfully performing the move, there should not be a piece selected.
                 IsPieceSelected = false;
-          }
-          else 
-          {
-              // BoardLocation location = new BoardLocation();
-              //ArrayList<BoardLocation> availableMoves = game.getAvailableMoves(location); //Display();
-              selectedLocation = targetLocation;
-              IsPieceSelected = true;
-          }
+            }
+            else 
+            {
+                setSelectedLocation(targetLocation);
+            }
         }
-        catch (Exception ex)
+        /*
+        catch (WrongTurnException wtx)
         {
-            System.out.println(ex.getMessage());
+            // Log the exception to the console, and show a message box informing the user that it's the wrong turn.
+            System.out.println(wtx.getMessage());
+            JOptionPane.showMessageDialog(null, "It's not your turn!", "Invalid move", JOptionPane.INFORMATION_MESSAGE);
+        }
+        */
+        catch (InvalidMoveException x)
+        {
+            JOptionPane.showMessageDialog(null, "Invalid move! Please try a different option.", "Invalid move", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    private void setSelectedLocation(BoardLocation targetLocation)
+    {
+        try
+        {
+        selectedLocation = targetLocation;
+        
+        ArrayList<BoardLocation> availableMoves = game.getAvailableMoves(targetLocation);
+        
+        for (BoardLocation location : availableMoves)
+        {
+            int row = location.getRow();
+            int col = location.getColumn();
+            
+            SetButtonStyle(buttons[row][col], row, col, HIGHLIGHT_BORDER_COLOR);
+        }
+        
+        // Set the selected button's border color to cyan.
+        int row = targetLocation.getRow();
+        int col = targetLocation.getColumn();
+        SetButtonStyle(buttons[row][col], row, col, SELECTED_BORDER_COLOR);
+        
+        IsPieceSelected = true;
+        }
+        catch (NullPointerException npx)
+        {
+            System.out.println(npx);
         }
     }
     
@@ -165,22 +215,39 @@ public class GameController extends javafx.scene.layout.StackPane
         b.setLayoutX(BUTTONSIZE * column);
         b.setLayoutY(BUTTONSIZE * row);
         
-        if (getSquareColor(row, column))
-        {
-            // If the square is a white square, set the color to the designated white-square color.
-            b.setStyle("-fx-background-color: #4248f4; "); 
-        }
-        else 
-        {
-            // If the square is a black square, set the color to the designated black-square color.
-            b.setStyle("-fx-background-color: #c42d0f; "); 
-        }
+        SetButtonStyle(b, row, column, "");
 
         //String colorStyle
        
         //b.setStyle(".button:hover {-fx-border-color: yellow; -fx-border-width: 1; } .button:pressed {-fx-background-color: brown; }");
         
         return b;
+    }
+    
+    private void SetButtonStyle(Button b, int row, int column, String borderColor)
+    {
+        String style = "-fx-background-color: ";
+        String backgroundColor;
+        
+        if (getSquareColor(row, column))
+        {
+            // If the square is a white square, set the color to the designated white-square color.
+            backgroundColor = WHITE_SQUARE_COLOR;
+        }
+        else 
+        {
+            // If the square is a black square, set the color to the designated black-square color.
+            backgroundColor = BLACK_SQUARE_COLOR;
+        }
+        
+        style += backgroundColor + ";";       
+       
+        if (!borderColor.equals(new String()))
+        {
+            style +=  "-fx-border-color: " + borderColor + "; -fx-border-width: 4 4 4 4;";
+        }
+        
+        b.setStyle(style);
     }
     
     private void loadImageView(Button button, Image img)
@@ -217,6 +284,7 @@ public class GameController extends javafx.scene.layout.StackPane
     public void setView(IView view)
     {
         this.view = view;
+        view.SetGame(this.game);
     }
     
     // Cycle through every space on the board. If empty, ignores.
@@ -231,6 +299,9 @@ public class GameController extends javafx.scene.layout.StackPane
         {
             for (int k = 0; k < 8; k++) 
             {
+                // Re-set the button borders.
+                SetButtonStyle(buttons[i][k], i, k, "");
+
                 if(pieces[i][k] == null)
                 {
                     // Set the Button's graphic to 'null', and add it to the grid.
@@ -248,5 +319,9 @@ public class GameController extends javafx.scene.layout.StackPane
 
         this.getChildren().clear();
         this.getChildren().add(grid);
+        
+        this.view.Display();
+        // Update the IView object belonging to this class.
+        //this.view.display(game);
     }
 }

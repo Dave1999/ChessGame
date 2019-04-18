@@ -5,8 +5,12 @@
  */
 package chessgame.models;
 
+import chessgame.exceptions.UnknownColorException;
+import chessgame.exceptions.UnknownTypeException;
 import chessgame.models.Piece.TeamColor;
 import chessgame.models.Piece.PieceType;
+import static chessgame.models.Piece.PieceTypeToString;
+import static chessgame.models.Piece.TeamColorToString;
 
 /**
  *
@@ -47,8 +51,14 @@ public class Move
         return this.EndLocation;
     }
     
+    @Override
     public String toString()
     {
-        return "";
+        String moveStr = "Moved " + TeamColorToString(this.Team) + " " + 
+                PieceTypeToString(this.Type) + " from location " +
+                this.StartLocation.toString() + " to location " + 
+                this.EndLocation.toString();
+        
+        return moveStr;       
     }
 }

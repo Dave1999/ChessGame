@@ -5,6 +5,9 @@
  */
 package chessgame.models;
 
+import chessgame.exceptions.UnknownColorException;
+import chessgame.exceptions.UnknownTypeException;
+
 /**
  *
  * @author Dalton
@@ -66,6 +69,40 @@ public class Piece
         else
         {
             return true;
+        }
+    }
+    
+    public static String TeamColorToString(TeamColor color)
+    {
+        switch (color)
+        {
+            case Black:
+                return "Black";
+            case White:
+                return "White";
+            default:
+                throw new UnknownColorException("Invalid team color.");
+        }
+    }
+    
+    public static String PieceTypeToString(PieceType type)
+    {
+        switch (type)
+        {
+            case Rook:
+                return "Rook";
+            case Bishop:
+                return "Bishop";
+            case King:
+                return "King";                
+            case Queen:
+                return "Queen";                
+            case Pawn:
+                return "Pawn";                
+            case Knight:
+                return "Knight";                
+            default:
+                throw new UnknownTypeException("Unknown piece type");
         }
     }
 }
