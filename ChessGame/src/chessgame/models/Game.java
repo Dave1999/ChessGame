@@ -1,5 +1,6 @@
 package chessgame.models;
 
+import java.util.Timer;
 import chessgame.exceptions.ObstacleCheckException;
 import static chessgame.models.Piece.PieceType.King;
 import static chessgame.models.Piece.PieceType.Knight;
@@ -22,12 +23,15 @@ public class Game
     public static final int BOARD_HEIGHT = 8;
     public static final int BOARD_WIDTH = 8;
     
-    private Piece[][] m_Pieces;
+    private final Piece[][] m_Pieces;
     private int TurnCount;
     private TeamColor TurnIndicator;
-    private ArrayList<Move> Moves; 
+    private final ArrayList<Move> Moves; 
     private ArrayList<BoardLocation> ValidMoves;
-
+    
+    //private int 
+    //private Timer MoverTimer;
+    
     public Game()
     {
         this.Moves = new ArrayList<>();
@@ -218,117 +222,6 @@ public class Game
         return !areThereObstacles(selectedLocation, selectedPiece, targetLocation);
     }
 
-/*
-    private boolean areThereObstacles(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation) 
-    {
-          if (selectedPiece.getType() == Knight || selectedPiece.getType() == King)
-            return false;
-        
-        int rowStart = selectedLocation.getRow();
-        int colStart = selectedLocation.getColumn();
-        int rowEnd = targetLocation.getRow();
-        int colEnd = targetLocation.getColumn();
-        
-        int i = rowStart;
-        int k = colStart;
-        boolean homeSpace = true; //This is used to make sure the piece doesn't think it's blocking itself
-        
-        //Horizontal move
-        if (rowStart == rowEnd)
-        {
-            if (colStart > colEnd) 
-            {
-                //Movement left
-                while (k > colEnd)
-                {
-                    if (homeSpace == true) 
-                    {
-                        homeSpace = false;
-                        k--;
-                        continue;
-                    }
-                    else if (this.m_Pieces[i][k] == null){}
-                    else 
-                    {
-                        return true;
-                    }
-                    k--;
-                }
-                return false;
-            }
-            else if (colStart < colEnd) 
-            {
-                //Movement right
-                while (k < colEnd)
-                {
-                    if (homeSpace == true) 
-                    {
-                        homeSpace = false;
-                        k++;
-                        continue;
-                    }
-                    else if (this.m_Pieces[i][k] == null){}
-                    else 
-                    {
-                        return true;
-                    }
-                    k++;
-                }
-                return false;
-            }
-        }
-        
-        //Vertical move
-        else if (colStart == colEnd)
-        {
-            int incrementStart = Min(rowStart, rowEnd);
-            int incrementEnd = Max(rowStart, rowEnd);
-            
-            
-            if (rowStart > rowEnd)
-            {
-                //Movement up
-                while (i > rowEnd)
-                {
-                    if (homeSpace == true) 
-                    {
-                        homeSpace = false;
-                        i--;
-                        continue;
-                    }
-                    else if (this.m_Pieces[i][k] == null) {}
-                    else 
-                    {
-                        return true;
-                    }
-                    i--;
-                }
-                return false;
-            }
-            else if (rowStart < rowEnd)
-            {
-                //Movement down
-                while (i < rowEnd)
-                {
-                    if (homeSpace == true) 
-                    {
-                        homeSpace = false;
-                        i++;
-                        continue;
-                    }
-                    else if (this.m_Pieces[i][k] == null) {}
-                    else 
-                    {
-                        return true;
-                    }
-                    i++;
-                }
-                return false;
-            }
-        }
-    }
-    */
-    
     // Returns false if no obstacles
     private boolean areThereObstacles(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation) 
     {
@@ -342,6 +235,7 @@ public class Game
         int rowEnd = targetLocation.getRow();
         int colEnd = targetLocation.getColumn();
         
+        // Special rules for Pawn pieces.
         if (selectedPiece.getType() == Pawn)
         {
             if (colStart == colEnd)
@@ -561,13 +455,12 @@ public class Game
             
             Move move = new Move(selectedPiece.getColor(), selectedPiece.getType(), start, end);
             this.Moves.add(move);
-
-            //this.getPieceAt(start)
-            this.UpdateTurn();
             
             // Evaluate special moves.
-            EvaluateSpecialMoves();
+            EvaluateSpecialMoves(start, selectedPiece, end);
             
+            // Update the turn counter and the turn indicator.
+            this.UpdateTurn();
             return true;
         }
         else 
@@ -576,8 +469,26 @@ public class Game
         }
     }
 
-    private void EvaluateSpecialMoves()
+    private void EvaluateSpecialMoves(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation)
     {
-        // Check pawns, check, etc.
+        // Check for pawn promotion.
+        if (selectedPiece.getType() == Pawn)
+        {
+            if ((selectedPiece.getColor() == TeamColor.Black) && (targetLocation.getRow() == 7))
+            {
+                // If a Black pawn has reached the last row, promote it to a Queen.
+                setPieceAt(targetLocation, new Queen(TeamColor.Black));
+            }
+            else if ((selectedPiece.getColor() == TeamColor.White) && (targetLocation.getRow() == 0))
+            {
+                // If a White pawn has reached the last row, promote it to a Queen.
+                setPieceAt(targetLocation, new Queen(TeamColor.White));
+            }
+        }
+        
+        // Check for castling.
+        
+        
+        // Check for en passant.
     }
 }
