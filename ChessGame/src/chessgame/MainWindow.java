@@ -7,9 +7,6 @@ package chessgame;
 
 import chessgame.controllers.GameController;
 import chessgame.views.GameView;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;

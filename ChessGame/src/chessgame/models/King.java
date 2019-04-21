@@ -41,7 +41,7 @@ public class King extends Piece
             return true;
         }
         //Returns true for tile to the right of the king
-        else if((colEnd == (colEnd + 1)) && (rowEnd == rowStart))
+        else if((colEnd == (colStart + 1)) && (rowEnd == rowStart))
         {
             return true;
         }

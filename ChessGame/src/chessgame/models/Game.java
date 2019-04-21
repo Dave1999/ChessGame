@@ -1,10 +1,15 @@
 package chessgame.models;
 
+import chessgame.exceptions.ExposesOwnTeamToCheckException;
 import java.util.Timer;
 import chessgame.exceptions.ObstacleCheckException;
+import chessgame.models.Piece.PieceType;
 import static chessgame.models.Piece.PieceType.King;
 import static chessgame.models.Piece.PieceType.Knight;
 import static chessgame.models.Piece.PieceType.Pawn;
+import static chessgame.models.Piece.PieceType.Rook;
+import static chessgame.models.Piece.PieceType.Queen;
+import static chessgame.models.Piece.PieceType.Bishop;
 import java.util.ArrayList;
 import chessgame.models.Piece.TeamColor;
 
@@ -225,86 +230,61 @@ public class Game
     // Returns false if no obstacles
     private boolean areThereObstacles(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation) 
     {
-        if (selectedPiece.getType() == Knight || selectedPiece.getType() == King)
-        {
-            return false;
-        }
+        PieceType type = selectedPiece.getType();
    
+        int colStart = selectedLocation.getColumn();
+        int colEnd = targetLocation.getColumn();
+
+        if (type != null)
+        {
+            // Special rules for Pawn pieces.
+            switch (type)
+            {
+                case Knight:
+                case King:
+                    return false;
+                case Pawn:
+                    if (colStart == colEnd)
+                    {
+                        // The move is vertical. Therefore, if there is a piece in front of the pawn, it is invalid.
+                        return !this.isSpaceEmpty(targetLocation);
+                    }
+                    else
+                    {
+                        // The move is diagonal. Therefore, there are "obstacles" to the pawn's progress if the
+                        // space is empty.
+                        return this.isSpaceEmpty(targetLocation);
+                    }
+                case Queen:
+                    return areThereHorizontalObstacles(selectedLocation, selectedPiece, targetLocation) &&
+                           areThereVerticalObstacles(selectedLocation, selectedPiece, targetLocation) && 
+                           areThereDiagonalObstacles(selectedLocation, selectedPiece, targetLocation);
+                case Rook:
+                    return areThereHorizontalObstacles(selectedLocation, selectedPiece, targetLocation) &&
+                            areThereVerticalObstacles(selectedLocation, selectedPiece, targetLocation);
+                case Bishop:
+                    return areThereDiagonalObstacles(selectedLocation, selectedPiece, targetLocation);
+                default:
+                    break;
+            }
+        }
+        
+        throw new ObstacleCheckException("areThereObstacles() in class Game reached the end of the method without returning.");
+    }
+    
+    private boolean areThereVerticalObstacles(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation)
+    {
         int rowStart = selectedLocation.getRow();
         int colStart = selectedLocation.getColumn();
         int rowEnd = targetLocation.getRow();
         int colEnd = targetLocation.getColumn();
         
-        // Special rules for Pawn pieces.
-        if (selectedPiece.getType() == Pawn)
-        {
-            if (colStart == colEnd)
-            {
-                // The move is vertical. Therefore, if there is a piece in front of the pawn, it is invalid.
-                if (!this.isSpaceEmpty(targetLocation))
-                {
-                    return true;
-                }
-            }
-            else 
-            {
-                // The move is diagonal. Therefore, there are "obstacles" to the pawn's progress if the 
-                // space is empty.
-                return this.isSpaceEmpty(targetLocation);
-            }
-        }
-        
         int i = rowStart;
         int k = colStart;
         boolean homeSpace = true; //This is used to make sure the piece doesn't think it's blocking itself
         
-        //Horizontal move
-        if (rowStart == rowEnd)
-        {
-            if (colStart > colEnd) 
-            {
-                //Movement left
-                while (k > colEnd)
-                {
-                    if (homeSpace == true) 
-                    {
-                        homeSpace = false;
-                        k--;
-                        continue;
-                    }
-                    else if (this.m_Pieces[i][k] == null){}
-                    else 
-                    {
-                        return true;
-                    }
-                    k--;
-                }
-                return false;
-            }
-            else if (colStart < colEnd) 
-            {
-                //Movement right
-                while (k < colEnd)
-                {
-                    if (homeSpace == true) 
-                    {
-                        homeSpace = false;
-                        k++;
-                        continue;
-                    }
-                    else if (this.m_Pieces[i][k] == null){}
-                    else 
-                    {
-                        return true;
-                    }
-                    k++;
-                }
-                return false;
-            }
-        }
-        
         //Vertical move
-        else if (colStart == colEnd)
+        if (colStart == colEnd)
         {
             if (rowStart > rowEnd)
             {
@@ -347,117 +327,218 @@ public class Game
                 return false;
             }
         }
-        
-        //Move is diagonal
         else 
         {
-            if (rowStart > rowEnd && colStart > colEnd)
+            return true;
+        }
+        
+        // Should never reach here.
+        return true;
+    }
+    
+    private boolean areThereHorizontalObstacles(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation)
+    {
+        int rowStart = selectedLocation.getRow();
+        int colStart = selectedLocation.getColumn();
+        int rowEnd = targetLocation.getRow();
+        int colEnd = targetLocation.getColumn();
+        
+        int i = rowStart;
+        int k = colStart;
+        boolean homeSpace = true; //This is used to make sure the piece doesn't think it's blocking itself
+        
+        if (rowStart == rowEnd)
+        {
+            if (colStart > colEnd) 
             {
-                //Movement northwest
-                while (i > rowEnd && k > colEnd)
+                //Movement left
+                while (k > colEnd)
                 {
                     if (homeSpace == true) 
                     {
                         homeSpace = false;
-                        i--;
                         k--;
                         continue;
                     }
-                    else if (this.m_Pieces[i][k] == null) {}
+                    else if (this.m_Pieces[i][k] == null){}
                     else 
                     {
                         return true;
                     }
-                    i--;
                     k--;
                 }
                 return false;
             }
-            else if (rowStart < rowEnd && colStart > colEnd)
+            else if (colStart < colEnd) 
             {
-                //Movement southwest
-                while (i < rowEnd && k > colEnd)
+                //Movement right
+                while (k < colEnd)
                 {
                     if (homeSpace == true) 
                     {
                         homeSpace = false;
-                        i++;
-                        k--;
-                        continue;
-                    }
-                    else if (this.m_Pieces[i][k] == null) {}
-                    else 
-                    {
-                        return true;
-                    }
-                    i++;
-                    k--;
-                }
-                return false;
-            }
-            else if (rowStart > rowEnd && colStart < colEnd)
-            {
-                //Movement northeast
-                while (i > rowEnd && k < colEnd)
-                {
-                    if (homeSpace == true) 
-                    {
-                        homeSpace = false;
-                        i--;
                         k++;
                         continue;
                     }
-                    else if (this.m_Pieces[i][k] == null) {}
+                    else if (this.m_Pieces[i][k] == null)
+                    {
+                    }
                     else 
                     {
                         return true;
                     }
-                    i--;
-                    k++;
-                }
-                return false;
-            }
-            else if (rowStart < rowEnd && colStart < colEnd)
-            {
-                //Movement southeast
-                while (i < rowEnd && k < colEnd)
-                {
-                    if (homeSpace == true) 
-                    {
-                        homeSpace = false;
-                        i++;
-                        k++;
-                        continue;
-                    }
-                    else if (this.m_Pieces[i][k] == null) {}
-                    else 
-                    {
-                        return true;
-                    }
-                    i++;
                     k++;
                 }
                 return false;
             }
         }
-        throw new ObstacleCheckException("areThereObstacles() in class Game reached the end of the method without returning.");
+        else 
+        {
+            return true;
+        }
+        
+        // Should never reach here.
+        return true;
+    }
+
+    private boolean areThereDiagonalObstacles(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation)
+    {
+        int rowStart = selectedLocation.getRow();
+        int colStart = selectedLocation.getColumn();
+        int rowEnd = targetLocation.getRow();
+        int colEnd = targetLocation.getColumn();
+        
+        int i = rowStart;
+        int k = colStart;
+        boolean homeSpace = true; //This is used to make sure the piece doesn't think it's blocking itself
+        
+        // If the move is not diagonal, then it's not valid, and obstacles exist.
+        if (Math.abs(rowStart - rowEnd) != (Math.abs(colStart - colEnd)))
+        {
+            return true;
+        }
+
+        if (rowStart > rowEnd && colStart > colEnd)
+        {
+            //Movement northwest
+            while (i > rowEnd && k > colEnd)
+            {
+                if (homeSpace == true) 
+                {
+                    homeSpace = false;
+                    i--;
+                    k--;
+                    continue;
+                }
+                else if (this.m_Pieces[i][k] == null) {}
+                else 
+                {
+                    return true;
+                }
+                i--;
+                k--;
+            }
+            return false;
+        }
+        else if (rowStart < rowEnd && colStart > colEnd)
+        {
+            //Movement southwest
+            while (i < rowEnd && k > colEnd)
+            {
+                if (homeSpace == true) 
+                {
+                    homeSpace = false;
+                    i++;
+                    k--;
+                    continue;
+                }
+                else if (this.m_Pieces[i][k] == null) {}
+                else 
+                {
+                    return true;
+                }
+                i++;
+                k--;
+            }
+            return false;
+        }
+        else if (rowStart > rowEnd && colStart < colEnd)
+        {
+            //Movement northeast
+            while (i > rowEnd && k < colEnd)
+            {
+                if (homeSpace == true) 
+                {
+                    homeSpace = false;
+                    i--;
+                    k++;
+                    continue;
+                }
+                else if (this.m_Pieces[i][k] == null) {}
+                else 
+                {
+                    return true;
+                }
+                i--;
+                k++;
+            }
+            return false;
+        }
+        else if (rowStart < rowEnd && colStart < colEnd)
+        {
+            //Movement southeast
+            while (i < rowEnd && k < colEnd)
+            {
+                if (homeSpace == true) 
+                {
+                    homeSpace = false;
+                    i++;
+                    k++;
+                    continue;
+                }
+                else if (this.m_Pieces[i][k] == null) {}
+                else 
+                {
+                    return true;
+                }
+                i++;
+                k++;
+            }
+            return false;
+        }
+                
+        // Should never reach here.
+        return false;
     }
     
-    public boolean PerformMove(BoardLocation start, BoardLocation end)
+    public boolean PerformMove(Move move)
     {
-        Piece selectedPiece = this.getPieceAt(start);
+        BoardLocation start = move.getStartLocation();
+        BoardLocation end = move.getEndLocation();
+        Piece selectedPiece = move.getMovedPiece();
         
-       // if (isMoveValid(start, selectedPiece, end))
-        if (ValidMoves.contains(end))
+        /* If, for some reason, the list of valid moves hasn't been computed in real-time, 
+         * and the list doesn't contain the move, then re-calculate whether or not the move is valid. */
+        if (ValidMoves.contains(move.getEndLocation()) || isMoveValid(start, selectedPiece, end))
         {
+            // Actually make the move by moving pieces around within the array.
             this.setPieceAt(start, null);
             this.setPieceAt(end, selectedPiece);
             
-            Move move = new Move(selectedPiece.getColor(), selectedPiece.getType(), start, end);
-            this.Moves.add(move);
-            
             // Evaluate special moves.
             EvaluateSpecialMoves(start, selectedPiece, end);
+
+            boolean isOffenseInCheck = isCheck(this.TurnIndicator);
+            
+            if (isOffenseInCheck)
+            {
+                // If the move resulted in the offense being in check, undo it. Then, return false.
+                UndoMove(move);
+                throw new ExposesOwnTeamToCheckException("That move exposes your king to check!");
+            }
+
+            // Finally, add the move to the list of moves.
+            this.Moves.add(move);
             
             // Update the turn counter and the turn indicator.
             this.UpdateTurn();
@@ -467,6 +548,18 @@ public class Game
         {
             return false;
         }
+    }
+    
+    /**
+     * This function undoes a move, 
+     * @param move 
+     */
+    private void UndoMove(Move move)
+    {
+        this.setPieceAt(move.getStartLocation(), move.getMovedPiece());
+        this.setPieceAt(move.getEndLocation(), move.getCapturedPiece());
+        
+        this.Moves.remove(move);
     }
 
     private void EvaluateSpecialMoves(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation)
@@ -488,7 +581,86 @@ public class Game
         
         // Check for castling.
         
-        
         // Check for en passant.
+    }
+    
+    private boolean isCheck(TeamColor colorToCheck)
+    {
+        try
+        {
+            TeamColor oppositeColor;
+            if (colorToCheck == TeamColor.White)
+            {
+                oppositeColor = TeamColor.Black;
+            }
+            else 
+            {
+                oppositeColor = TeamColor.White;
+            }
+
+            BoardLocation kingLocation = FindKing(colorToCheck);
+
+            for (int i = 0; i < 8; i++)
+            {
+                for (int k = 0; k < 8; k++)
+                {
+                    BoardLocation iteratedLocation = new BoardLocation(i, k);
+                    Piece p = this.getPieceAt(iteratedLocation);
+
+                    if ((p != null) && p.getColor() == oppositeColor)
+                    {
+                        PieceType type = p.getType();
+
+                        if ((type == Queen) || (type == Bishop) || (type == Rook))
+                        {
+                            if (!areThereObstacles(iteratedLocation, p, kingLocation))
+                            {
+                                return true;
+                            }
+                        }
+                        else if (type == Pawn)
+                        {
+
+                        }
+                        else if (type == Knight)
+                        {
+
+                        }
+                        else if (type == King)
+                        {
+
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            System.out.println(ex);
+        }
+        
+        return false;
+    }
+        
+    private BoardLocation FindKing(TeamColor color)
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int k = 0; k < 8; k++)
+            {
+                BoardLocation location = new BoardLocation(i, k);
+                Piece p = this.getPieceAt(location);
+
+                if (p != null)
+                {
+                    if ((p.getType() == King) && (p.getColor() == color))
+                    {
+                        return location;
+                    }
+                }
+            }
+        }
+        
+        return null;
     }
 }

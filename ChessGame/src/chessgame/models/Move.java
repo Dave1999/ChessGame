@@ -18,27 +18,19 @@ import static chessgame.models.Piece.TeamColorToString;
  */
 public class Move 
 {
-    private final TeamColor Team;
-    private final PieceType Type; 
+    //private final TeamColor Team;
+    //private final PieceType Type; 
     private final BoardLocation StartLocation;
     private final BoardLocation EndLocation;
+    private final Piece MovedPiece;
+    private final Piece CapturedPiece;
     
-    public Move(TeamColor team, PieceType type, BoardLocation start, BoardLocation end)
+    public Move(Piece movedPiece, Piece capturedPiece, BoardLocation start, BoardLocation end)
     {
-        this.Team = team;
-        this.Type = type;
+        this.MovedPiece = movedPiece;
+        this.CapturedPiece = capturedPiece;
         this.StartLocation = start;
         this.EndLocation = end;
-    }
-    
-    public TeamColor getTeam()
-    {
-        return this.Team;
-    }
-    
-    public PieceType getType()
-    {
-        return this.Type;
     }
     
     public BoardLocation getStartLocation()
@@ -51,14 +43,35 @@ public class Move
         return this.EndLocation;
     }
     
+    public Piece getMovedPiece()
+    {
+        return this.MovedPiece;
+    }
+    
+    public Piece getCapturedPiece()
+    {
+        return this.CapturedPiece;
+    }
+    
+    public boolean wasPieceCaptured()
+    {
+        return this.CapturedPiece != null;
+    }
+    
     @Override
     public String toString()
     {
-        String moveStr = "Moved " + TeamColorToString(this.Team) + " " + 
-                PieceTypeToString(this.Type) + " from location " +
+        String moveStr = "Moved " + TeamColorToString(this.MovedPiece.getColor()) + " " + 
+                PieceTypeToString(this.MovedPiece.getType()) + " from location " +
                 this.StartLocation.toString() + " to location " + 
                 this.EndLocation.toString();
         
+        if (this.wasPieceCaptured())
+        {
+            moveStr += ", capturing a " + TeamColorToString(this.CapturedPiece.getColor()) + " " + PieceTypeToString(this.CapturedPiece.getType());
+        }
+        
+        moveStr += ".";
         return moveStr;       
     }
 }

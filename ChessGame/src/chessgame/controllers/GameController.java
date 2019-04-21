@@ -5,12 +5,14 @@
  */
 package chessgame.controllers;
 
+import chessgame.exceptions.ExposesOwnTeamToCheckException;
 import chessgame.exceptions.InvalidMoveException;
 import chessgame.exceptions.WrongTurnException;
 
 import chessgame.models.BoardLocation;
 import chessgame.models.Game;
 import chessgame.models.ImageManager;
+import chessgame.models.Move;
 import chessgame.models.Piece;
 import chessgame.views.IView;
 import java.util.ArrayList;
@@ -120,9 +122,16 @@ public class GameController extends javafx.scene.layout.StackPane
                     return;
                 }
 
-                // Otherwise, attempt to move the piece.
-                boolean result = game.PerformMove(selectedLocation, targetLocation);
-
+                // Otherwise, attempt to move the piece, by constructing a new Move and having the game 
+                // perform it.
+                Move move = new Move(
+                        game.getPieceAt(selectedLocation), 
+                        game.getPieceAt(targetLocation), 
+                        selectedLocation, 
+                        targetLocation);
+                
+                boolean result = game.PerformMove(move);
+                
                 // If the move worked, then re-display the board. Otherwise, show an error message. 
                 if (result)
                 {
@@ -149,8 +158,14 @@ public class GameController extends javafx.scene.layout.StackPane
             JOptionPane.showMessageDialog(null, "It's not your turn!", "Invalid move", JOptionPane.INFORMATION_MESSAGE);
         }
         */
-        catch (InvalidMoveException x)
+        catch (ExposesOwnTeamToCheckException ex)
         {
+            System.out.println(ex.getMessage());
+            JOptionPane.showMessageDialog(null, "Invalid move! " + ex.getMessage(), "Invalid move", JOptionPane.INFORMATION_MESSAGE);
+        }
+        catch (InvalidMoveException imx)
+        {
+            System.out.println(imx.getMessage());
             JOptionPane.showMessageDialog(null, "Invalid move! Please try a different option.", "Invalid move", JOptionPane.INFORMATION_MESSAGE);
         }
     }
@@ -159,24 +174,24 @@ public class GameController extends javafx.scene.layout.StackPane
     {
         try
         {
-        selectedLocation = targetLocation;
+            selectedLocation = targetLocation;
         
-        ArrayList<BoardLocation> availableMoves = game.getAvailableMoves(targetLocation);
-        
-        for (BoardLocation location : availableMoves)
-        {
-            int row = location.getRow();
-            int col = location.getColumn();
-            
-            SetButtonStyle(buttons[row][col], row, col, HIGHLIGHT_BORDER_COLOR);
-        }
-        
-        // Set the selected button's border color to cyan.
-        int row = targetLocation.getRow();
-        int col = targetLocation.getColumn();
-        SetButtonStyle(buttons[row][col], row, col, SELECTED_BORDER_COLOR);
-        
-        IsPieceSelected = true;
+            ArrayList<BoardLocation> availableMoves = game.getAvailableMoves(targetLocation);
+
+            for (BoardLocation location : availableMoves)
+            {
+                int row = location.getRow();
+                int col = location.getColumn();
+
+                SetButtonStyle(buttons[row][col], row, col, HIGHLIGHT_BORDER_COLOR);
+            }
+
+            // Set the selected button's border color to cyan.
+            int row = targetLocation.getRow();
+            int col = targetLocation.getColumn();
+            SetButtonStyle(buttons[row][col], row, col, SELECTED_BORDER_COLOR);
+
+            IsPieceSelected = true;
         }
         catch (NullPointerException npx)
         {
