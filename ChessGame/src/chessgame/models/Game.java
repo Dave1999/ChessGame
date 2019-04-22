@@ -1,6 +1,6 @@
 package chessgame.models;
 
-import chessgame.exceptions.ExposesOwnTeamToCheckException;
+import chessgame.exceptions.KingIsInCheckException;
 import java.util.Timer;
 import chessgame.exceptions.ObstacleCheckException;
 import chessgame.models.Piece.PieceType;
@@ -28,35 +28,35 @@ public class Game
     public static final int BOARD_HEIGHT = 8;
     public static final int BOARD_WIDTH = 8;
     
-    private final Piece[][] m_Pieces;
+    private Piece[][] m_Pieces;
     private int TurnCount;
     private TeamColor TurnIndicator;
-    private final ArrayList<Move> Moves; 
+    private ArrayList<Move> Moves; 
     private ArrayList<BoardLocation> ValidMoves;
-    
-    //private int 
-    //private Timer MoverTimer;
     
     public Game()
     {
-        this.Moves = new ArrayList<>();
-        this.m_Pieces = new Piece[BOARD_HEIGHT][BOARD_WIDTH];
-        
-        // The turn count will be incremented after the first turn is played.
+        // Call the InitializeGameState function to initialize a new game.
+        this.InitializeGameState();
     }
     
     /** 
      * Initializes the game board to the default game state, by creating all the Piece objects and 
      * placing them where they belong.
      */
-    // Initializes the game board to the d
     public final void InitializeGameState()
     {
+        this.Moves = new ArrayList<>();
+        this.m_Pieces = new Piece[BOARD_HEIGHT][BOARD_WIDTH];
         this.TurnIndicator = TeamColor.White;
         this.TurnCount = 0;
         this.CreatePieces();
+        // The turn count will be incremented after the first turn is played.
     }
     
+    /**
+     * Creates the game-pieces and places them in their default positions.
+     */
     private void CreatePieces()
     {
         // Start out by initializing the pieces to all empty, in case the Game object is being reused.
@@ -110,6 +110,9 @@ public class Game
         this.m_Pieces[7][7] = new Rook(TeamColor.White);
     }
     
+    /**
+     * Updates the turn indicator and increments the turn count (if necessary).
+     */
     public void UpdateTurn()
     {
         if (this.TurnIndicator == TeamColor.Black)
@@ -128,6 +131,11 @@ public class Game
         return this.m_Pieces;
     }
     
+    /**
+     * Returns the Piece object at the specified BoardLocation.
+     * @param location the location of the desired Piece.
+     * @return 
+     */
     public Piece getPieceAt(BoardLocation location)
     {
         return m_Pieces[location.getRow()][location.getColumn()];
@@ -165,9 +173,14 @@ public class Game
         }
     }
     
+    /**
+     * Returns the list of available moves from the given location.
+     * @param selectedLocation
+     * @return 
+     */
     public ArrayList<BoardLocation> getAvailableMoves(BoardLocation selectedLocation)
     {
-        ArrayList<BoardLocation> availableMoves = new ArrayList<BoardLocation>();
+        ArrayList<BoardLocation> availableMoves = new ArrayList<>();
         Piece selectedPiece = this.getPieceAt(selectedLocation);
         
         // Only permit the move if the piece is of the correct color.
@@ -195,6 +208,14 @@ public class Game
         }                
     }
     
+    /**
+     * Returns 'true' if the specified move is valid, given a start location, its corresponding Piece
+     * object, and a target location.
+     * @param selectedLocation the location from which the move is being made.
+     * @param selectedPiece the selected Piece object.
+     * @param targetLocation the location to which the move is being made.
+     * @return 
+     */
     public boolean isMoveValid(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation)
     {
         // First, check if the space is occupied by a piece of the same color.
@@ -511,6 +532,29 @@ public class Game
         return false;
     }
     
+    private boolean doesKnightThreaten(BoardLocation start, BoardLocation end)
+    {
+        int rowStart = start.getRow();
+        int colStart = start.getColumn();
+        int rowEnd = end.getRow();
+        int colEnd = end.getColumn();
+        
+        // The Knight can threaten from this position if the 
+        return ((Math.abs(rowStart - rowEnd) == 2) && (Math.abs(colEnd - colStart) == 1)) || 
+               ((Math.abs(rowStart - rowEnd) == 1) && (Math.abs(colEnd - colStart) == 2));
+    }
+    
+    private boolean doesKingThreaten(BoardLocation start, BoardLocation end)
+    {
+        int rowStart = start.getRow();
+        int colStart = start.getColumn();
+        int rowEnd = end.getRow();
+        int colEnd = end.getColumn();
+        
+        // If the two pieces are within 1 square in any direction, then     
+        return (Math.abs(rowStart - rowEnd) <= 1) && (Math.abs(colStart - colEnd) <= 1);
+    }
+    
     public boolean PerformMove(Move move)
     {
         BoardLocation start = move.getStartLocation();
@@ -534,7 +578,7 @@ public class Game
             {
                 // If the move resulted in the offense being in check, undo it. Then, return false.
                 UndoMove(move);
-                throw new ExposesOwnTeamToCheckException("That move exposes your king to check!");
+                throw new KingIsInCheckException("Your king is in check!");
             }
 
             // Finally, add the move to the list of moves.
@@ -620,15 +664,41 @@ public class Game
                         }
                         else if (type == Pawn)
                         {
+                            // First, check if they are separated by only one column.
+                            boolean doesThreaten = Math.abs(kingLocation.getColumn() - iteratedLocation.getColumn()) == 1; 
 
+                            /* If the pawn is White, it will threaten the Black king when the pawn is on
+                             * the row that is 1 greater than the king. For a Black pawn and a White 
+                             * King, the pawn will threaten when its row is 1 less than the king's. */
+                            if (p.getColor() == TeamColor.White)
+                            {
+                                doesThreaten &= ((iteratedLocation.getRow() - kingLocation.getRow()) == 1);
+                            }
+                            else 
+                            {
+                                doesThreaten &= ((kingLocation.getRow() - iteratedLocation.getRow()) == 1);
+                            }
+                                
+                            if (doesThreaten)
+                            {
+                                return true;
+                            }
                         }
                         else if (type == Knight)
                         {
-
+                            /* If the piece is a Knight, return 'true' if it is in a position that threatens
+                             * the King. */
+                            if (doesKnightThreaten(iteratedLocation, kingLocation))
+                            {
+                                return true;
+                            }
                         }
                         else if (type == King)
                         {
-
+                            if (doesKingThreaten(iteratedLocation, kingLocation))
+                            {
+                                return true;
+                            }
                         }
                     }
                 }
@@ -661,6 +731,6 @@ public class Game
             }
         }
         
-        return null;
+        return null;    
     }
 }

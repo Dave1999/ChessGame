@@ -5,10 +5,8 @@
  */
 package chessgame.controllers;
 
-import chessgame.exceptions.ExposesOwnTeamToCheckException;
 import chessgame.exceptions.InvalidMoveException;
-import chessgame.exceptions.WrongTurnException;
-
+import chessgame.exceptions.KingIsInCheckException;
 import chessgame.models.BoardLocation;
 import chessgame.models.Game;
 import chessgame.models.ImageManager;
@@ -32,9 +30,11 @@ import javax.swing.JOptionPane;
 
 public class GameController extends javafx.scene.layout.StackPane
 {
+    // Constant values to determine the size of the grid buttons in the chessboard display.
     private static final int BUTTONSIZE = 70;
     private static final int BUTTON_PADDING = 1;
     
+    // Constant strings indicating background and highlight colors for the buttons.
     private final String WHITE_SQUARE_COLOR = "#4248f4";
     private final String BLACK_SQUARE_COLOR = "#c42d0f"; 
     private final String HIGHLIGHT_BORDER_COLOR = "#129b24";
@@ -80,6 +80,7 @@ public class GameController extends javafx.scene.layout.StackPane
             }
         }
         
+        // Lay out the main control panel.
         grid = new GridPane();
         grid.setPadding(new Insets(BUTTON_PADDING));
         grid.setHgap(BUTTON_PADDING);
@@ -89,7 +90,6 @@ public class GameController extends javafx.scene.layout.StackPane
         
         // Initialize the game state.
         this.game = new Game();
-        game.InitializeGameState();
     }
 
     /** 
@@ -150,15 +150,7 @@ public class GameController extends javafx.scene.layout.StackPane
                 setSelectedLocation(targetLocation);
             }
         }
-        /*
-        catch (WrongTurnException wtx)
-        {
-            // Log the exception to the console, and show a message box informing the user that it's the wrong turn.
-            System.out.println(wtx.getMessage());
-            JOptionPane.showMessageDialog(null, "It's not your turn!", "Invalid move", JOptionPane.INFORMATION_MESSAGE);
-        }
-        */
-        catch (ExposesOwnTeamToCheckException ex)
+        catch (KingIsInCheckException ex)
         {
             System.out.println(ex.getMessage());
             JOptionPane.showMessageDialog(null, "Invalid move! " + ex.getMessage(), "Invalid move", JOptionPane.INFORMATION_MESSAGE);
@@ -231,11 +223,6 @@ public class GameController extends javafx.scene.layout.StackPane
         b.setLayoutY(BUTTONSIZE * row);
         
         SetButtonStyle(b, row, column, "");
-
-        //String colorStyle
-       
-        //b.setStyle(".button:hover {-fx-border-color: yellow; -fx-border-width: 1; } .button:pressed {-fx-background-color: brown; }");
-        
         return b;
     }
     
@@ -302,9 +289,10 @@ public class GameController extends javafx.scene.layout.StackPane
         view.SetGame(this.game);
     }
     
-    // Cycle through every space on the board. If empty, ignores.
-    // Checks non-empty spaces first for its PieceType and then its TeamColor.
-    // Draws the appropriate image from Images
+    /**
+     * Displays the GameController and the chessboard. It does this by looping through the array of 
+     * Piece objects and finding an appropriate image.
+     */
     public final void Display()
     { 
         grid.getChildren().clear();
@@ -335,8 +323,7 @@ public class GameController extends javafx.scene.layout.StackPane
         this.getChildren().clear();
         this.getChildren().add(grid);
         
-        this.view.Display();
         // Update the IView object belonging to this class.
-        //this.view.display(game);
+        this.view.Display();
     }
 }
