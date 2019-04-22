@@ -248,6 +248,11 @@ public class Game
         return !areThereObstacles(selectedLocation, selectedPiece, targetLocation);
     }
 
+    public boolean hasGameStarted()
+    {
+        return this.Moves.size() != 0;
+    }
+    
     // Returns false if no obstacles
     private boolean areThereObstacles(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation) 
     {
@@ -291,6 +296,18 @@ public class Game
         }
         
         throw new ObstacleCheckException("areThereObstacles() in class Game reached the end of the method without returning.");
+    }
+    
+    public static TeamColor getOppositeColor(TeamColor color)
+    {
+        if (color == TeamColor.Black)
+        {
+            return TeamColor.White;
+        }
+        else 
+        {
+            return TeamColor.Black; 
+        }
     }
     
     private boolean areThereVerticalObstacles(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation)
@@ -544,6 +561,12 @@ public class Game
                ((Math.abs(rowStart - rowEnd) == 1) && (Math.abs(colEnd - colStart) == 2));
     }
     
+    /** 
+     * Auxiliary 
+     * @param start
+     * @param end
+     * @return 
+     */
     private boolean doesKingThreaten(BoardLocation start, BoardLocation end)
     {
         int rowStart = start.getRow();
@@ -555,6 +578,11 @@ public class Game
         return (Math.abs(rowStart - rowEnd) <= 1) && (Math.abs(colStart - colEnd) <= 1);
     }
     
+    /**
+     * Performs a move based on the specified Move object, and stores it inside the game.
+     * @param move the move to perform.
+     * @return a status flag indicating whether or not the move worked.
+     */
     public boolean PerformMove(Move move)
     {
         BoardLocation start = move.getStartLocation();
@@ -595,8 +623,9 @@ public class Game
     }
     
     /**
-     * This function undoes a move, 
-     * @param move 
+     * This function undoes a move, for example, if the game determines that performing the move 
+     * puts the offensive team into check.
+     * @param move the move to undo.
      */
     private void UndoMove(Move move)
     {
@@ -628,7 +657,12 @@ public class Game
         // Check for en passant.
     }
     
-    private boolean isCheck(TeamColor colorToCheck)
+    /**
+     * Returns 'true' if the specified team is in check.
+     * @param colorToCheck
+     * @return 
+     */
+    public boolean isCheck(TeamColor colorToCheck)
     {
         try
         {
@@ -712,6 +746,11 @@ public class Game
         return false;
     }
         
+    /**
+     * Returns the location of the specified color's King.
+     * @param color the color whose king to check for. 
+     * @return a BoardLocation holding the King's coordinates.
+     */
     private BoardLocation FindKing(TeamColor color)
     {
         for (int i = 0; i < 8; i++)

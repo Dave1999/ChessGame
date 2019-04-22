@@ -9,18 +9,27 @@ import chessgame.exceptions.InvalidMoveException;
 import chessgame.exceptions.KingIsInCheckException;
 import chessgame.models.BoardLocation;
 import chessgame.models.Game;
+import static chessgame.models.Game.getOppositeColor;
 import chessgame.models.ImageManager;
 import chessgame.models.Move;
 import chessgame.models.Piece;
+import static chessgame.models.Piece.TeamColorToString;
 import chessgame.views.IView;
 import java.util.ArrayList;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javax.swing.JOptionPane;
 
 /**
@@ -42,11 +51,18 @@ public class GameController extends javafx.scene.layout.StackPane
     
     // Models and views.
     private IView view;
-    private Game game;
+    private final Game game;
     private boolean IsPieceSelected;
     private final ImageManager images;
     
     // User interface elements.
+
+    // VBox to display the control buttons.
+    private VBox controlBox;
+    private Button btnResignGame;
+    private Button btnNewGame;
+    private Button btnExitProgram;
+    
     // Gridpane to display the buttons.
     private GridPane grid;
     private final Button[][] buttons;
@@ -79,17 +95,117 @@ public class GameController extends javafx.scene.layout.StackPane
                 buttons[i][k].addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);   
             }
         }
-        
+ 
         // Lay out the main control panel.
         grid = new GridPane();
         grid.setPadding(new Insets(BUTTON_PADDING));
         grid.setHgap(BUTTON_PADDING);
         grid.setVgap(BUTTON_PADDING);
-
         grid.setMouseTransparent(false);
+        
+        controlBox = new VBox();
+        controlBox.setAlignment(Pos.TOP_CENTER);
+        controlBox.setMouseTransparent(false);
+        // Create the control buttons.
+        CreateControlButtons();       
         
         // Initialize the game state.
         this.game = new Game();
+    }
+    
+    public Game getGame()
+    {
+        return this.game;
+    }
+    
+    private void CreateControlButtons()
+    {
+        int width = 120;
+        
+        // "Resign game" button.
+        btnResignGame = new Button();
+        btnResignGame.setMinWidth(width);
+        btnResignGame.setMaxWidth(width);
+        btnResignGame.setText("Resign game");
+        btnResignGame.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> 
+        {
+            btnResignGame_Click(e);
+        });
+        
+        // Create the "New game" button.
+        btnNewGame = new Button();
+        btnNewGame.setMinWidth(width);
+        btnNewGame.setMaxWidth(width);
+        btnNewGame.setText("New game");
+        btnNewGame.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> 
+        {
+            btnNewGame_Click(e);
+        });
+        
+        // Create the "Exit program" button.
+        btnExitProgram = new Button();
+        btnExitProgram.setMinWidth(width);
+        btnExitProgram.setMaxWidth(width);
+        btnExitProgram.setText("Exit program"); 
+        btnExitProgram.addEventHandler(MouseEvent.MOUSE_CLICKED, (MouseEvent e) -> 
+        {
+            btnExitProgram_Click(e);
+        });
+        
+        controlBox.getChildren().add(btnResignGame);
+        controlBox.getChildren().add(btnNewGame);
+        controlBox.getChildren().add(btnExitProgram);
+    }
+    
+    private void btnResignGame_Click(MouseEvent event)
+    {
+        Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to resign the game? Have you checked all possible moves? Press OK to resign and start a new game, and press Cancel to return to the current game", ButtonType.OK, ButtonType.CANCEL);
+        alert.showAndWait();
+
+        if (alert.getResult() == ButtonType.OK) 
+        {
+            String teamName = TeamColorToString(getOppositeColor(game.getTurnIndicator()));
+            
+            String messageText = "The " + teamName + " team has won after " + game.getTurnCount() + " move(s)!";
+            Alert secondAlert = new Alert(AlertType.INFORMATION, messageText, ButtonType.OK);
+            secondAlert.showAndWait();
+        }
+        else if (alert.getResult() == ButtonType.CANCEL)
+        {
+            alert.hide();
+        }
+    }
+    
+    private void btnNewGame_Click(MouseEvent event)
+    {
+        Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to start a new game? Press OK to start a new game, and Cancel to resume the game.", ButtonType.OK, ButtonType.CANCEL);
+        alert.showAndWait();
+
+        if (alert.getResult() == ButtonType.OK) 
+        {
+            this.game.InitializeGameState();
+            this.Display();
+        }
+        else if (alert.getResult() == ButtonType.CANCEL)
+        {
+            alert.hide();
+        }
+    }
+        
+    private void btnExitProgram_Click(MouseEvent event)
+    {
+        Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to exit the program? Press OK to exit, and Cancel to resume the game.", ButtonType.OK, ButtonType.CANCEL);
+        alert.showAndWait();
+
+        if (alert.getResult() == ButtonType.OK) 
+        {
+            Stage stage = (Stage)this.getParent().getScene().getWindow();
+            stage.close();
+        }
+        else if (alert.getResult() == ButtonType.CANCEL)
+        {
+            alert.hide();
+        }
     }
 
     /** 
@@ -319,9 +435,15 @@ public class GameController extends javafx.scene.layout.StackPane
                 }
             }
         }
+        
+        BorderPane pane = new BorderPane();
+
+        pane.setLeft(grid);
+        pane.setCenter(controlBox);
+        //controlBox.setLayoutX(grid.getWidth());
 
         this.getChildren().clear();
-        this.getChildren().add(grid);
+        this.getChildren().add(pane);
         
         // Update the IView object belonging to this class.
         this.view.Display();

@@ -11,6 +11,7 @@ import javafx.scene.layout.StackPane;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -20,20 +21,23 @@ import javafx.stage.Stage;
  */
 public class MainWindow extends Application 
 {
-    private GameController controller;
+    private GameController gameController;
     private GameView view;
     
     @Override
     public void start(Stage primaryStage) 
     {
-        controller = new GameController();
+        gameController = new GameController();
         view = new GameView();
-        controller.setView(view);
-        controller.Display();
+        
+        gameController.setView(view);
+        gameController.Display();
 
-        StackPane root = new StackPane();
-        root.getChildren().add(controller);
-        root.getChildren().add(view);
+        //StackPane root = new StackPane();
+        BorderPane root = new BorderPane();
+        
+        root.setLeft(gameController);
+        root.setCenter(view);
         
         Scene scene = new Scene(root, 300, 250);
         
@@ -49,9 +53,6 @@ public class MainWindow extends Application
         primaryStage.setHeight(primaryScreenBounds.getHeight());
 
         primaryStage.show();
-        
-        //controller.setTranslateX(controller.getWidth() / 2);
-        view.setTranslateX(controller.getWidth() / 2);
     }
 
     /**

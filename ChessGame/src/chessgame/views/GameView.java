@@ -41,8 +41,13 @@ public class GameView extends StackPane implements IView
         HasInitializedDisplay = false;
         
         int width = 500;
-        int height = 800;
+        int height = 680;
         // Set the height and width.
+        
+        MoveListView.setMinWidth(width);
+        MoveListView.setMaxWidth(width);
+        MoveListView.setMinHeight(height - (TurnDisplay.getHeight() * 2));
+        MoveListView.setMaxHeight(height - (TurnDisplay.getHeight() * 2));
         
         this.setWidth(width);
         this.setMaxWidth(width);
@@ -54,8 +59,26 @@ public class GameView extends StackPane implements IView
     public void Display()
     {    
         this.displayLastMove();
+        String teamName = TeamColorToString(game.getTurnIndicator());
+        this.TurnDisplay.setText(teamName + "'s turn");
         
-        this.TurnDisplay.setText(TeamColorToString(game.getTurnIndicator()) + "'s turn");
+        /* Set the check status display to either "White is in check", "Black is in check", or "Neither
+         * team is in check". */
+        if (game.hasGameStarted())
+        {
+            if (game.isCheck(game.getTurnIndicator()))
+            {
+                this.CheckStatusDisplay.setText(teamName + " is in check");
+            }
+            else 
+            {
+                this.CheckStatusDisplay.setText("Neither team is in check");
+            }
+        }
+        else 
+        {
+            this.CheckStatusDisplay.setText("Neither team is in check");
+        }
         
         if (!HasInitializedDisplay)
         {
@@ -69,7 +92,11 @@ public class GameView extends StackPane implements IView
     {
         Move lastMove = game.getLastMove();
         
-        if (lastMove != null)
+        if (lastMove == null)
+        {
+           this.MoveListView.getItems().clear();
+        }
+        else 
         {
             String turnCount = this.getTurnCountString();
             String moveString = lastMove.toString();
