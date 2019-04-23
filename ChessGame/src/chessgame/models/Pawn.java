@@ -13,21 +13,30 @@ import static chessgame.models.Piece.PieceType.Pawn;
  */
 public class Pawn extends Piece 
 {
+    /**
+     * Constructor for the Pawn class.
+     * @param teamColor
+     */
     public Pawn(TeamColor teamColor) 
     {
         super(teamColor);
         this.PieceType = Pawn;
     }
      
-    /*
-    The Pawn subclass isMovePatternValid involves a check to see what the color of
-    the pawn is then it sends it down the correct move pattern path. Since Pawns can
-    only move forward that involves a different direction for the black and white 
-    pieces therefore the code for the white pieces would be addition checks and
-    the code for the black pieces would be subtraction checks. And if the pawn fits
-    neither color or an error occurs then an exception is thrown for the pawn and it 
-    returns false
-    */
+    /**
+     * The Pawn subclass isMovePatternValid involves a check to see what the color of
+     * the pawn is then it sends it down the correct move pattern path. Since Pawns can
+     * only move forward that involves a different direction for the black and white 
+     * pieces therefore the code for the white pieces would be addition checks and
+     * the code for the black pieces would be subtraction checks. And if the pawn fits
+     * neither color or an error occurs then an exception is thrown for the pawn and it 
+     * returns false
+     * @param rowStart
+     * @param colStart
+     * @param rowEnd
+     * @param colEnd
+     * @return
+     */
     @Override
     public boolean isMovePatternValid(int rowStart, int colStart, int rowEnd, int colEnd)
     {

@@ -1,7 +1,6 @@
 package chessgame.models;
 
 import chessgame.exceptions.KingIsInCheckException;
-import java.util.Timer;
 import chessgame.exceptions.ObstacleCheckException;
 import chessgame.models.Piece.PieceType;
 import static chessgame.models.Piece.PieceType.King;
@@ -34,6 +33,9 @@ public class Game
     private ArrayList<Move> Moves; 
     private ArrayList<BoardLocation> ValidMoves;
     
+    /**
+     *
+     */
     public Game()
     {
         // Call the InitializeGameState function to initialize a new game.
@@ -126,6 +128,10 @@ public class Game
         }
     }     
     
+    /**
+     *
+     * @return
+     */
     public Piece[][] getPieces() 
     {
         return this.m_Pieces;
@@ -141,26 +147,48 @@ public class Game
         return m_Pieces[location.getRow()][location.getColumn()];
     }
     
+    /**
+     *
+     * @param location
+     * @return
+     */
     public boolean isSpaceEmpty(BoardLocation location)
     {
         return (getPieceAt(location) == null);
     }
     
+    /**
+     *
+     * @param location
+     * @param piece
+     */
     public void setPieceAt(BoardLocation location, Piece piece)
     {
         m_Pieces[location.getRow()][location.getColumn()] = piece;
     }
     
+    /**
+     *
+     * @return
+     */
     public TeamColor getTurnIndicator()
     {
         return this.TurnIndicator;
     }
     
+    /**
+     *
+     * @return
+     */
     public int getTurnCount()
     {
         return this.TurnCount;
     }
 
+    /**
+     *
+     * @return
+     */
     public Move getLastMove()
     {
         if (this.Moves.isEmpty())
@@ -248,9 +276,13 @@ public class Game
         return !areThereObstacles(selectedLocation, selectedPiece, targetLocation);
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean hasGameStarted()
     {
-        return this.Moves.size() != 0;
+        return !this.Moves.isEmpty();
     }
     
     // Returns false if no obstacles
@@ -282,14 +314,14 @@ public class Game
                         return this.isSpaceEmpty(targetLocation);
                     }
                 case Queen:
-                    return areThereHorizontalObstacles(selectedLocation, selectedPiece, targetLocation) &&
-                           areThereVerticalObstacles(selectedLocation, selectedPiece, targetLocation) && 
-                           areThereDiagonalObstacles(selectedLocation, selectedPiece, targetLocation);
+                    return areThereHorizontalObstacles(selectedLocation, targetLocation) &&
+                           areThereVerticalObstacles(selectedLocation, targetLocation) && 
+                           areThereDiagonalObstacles(selectedLocation, targetLocation);
                 case Rook:
-                    return areThereHorizontalObstacles(selectedLocation, selectedPiece, targetLocation) &&
-                            areThereVerticalObstacles(selectedLocation, selectedPiece, targetLocation);
+                    return areThereHorizontalObstacles(selectedLocation, targetLocation) &&
+                            areThereVerticalObstacles(selectedLocation, targetLocation);
                 case Bishop:
-                    return areThereDiagonalObstacles(selectedLocation, selectedPiece, targetLocation);
+                    return areThereDiagonalObstacles(selectedLocation, targetLocation);
                 default:
                     break;
             }
@@ -298,6 +330,11 @@ public class Game
         throw new ObstacleCheckException("areThereObstacles() in class Game reached the end of the method without returning.");
     }
     
+    /**
+     * Auxiliary function to get the TeamColor OPPOSITE the color in the argument.
+     * @param color 
+     * @return 
+     */
     public static TeamColor getOppositeColor(TeamColor color)
     {
         if (color == TeamColor.Black)
@@ -310,7 +347,13 @@ public class Game
         }
     }
     
-    private boolean areThereVerticalObstacles(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation)
+    /**
+     * Determines if there are vertical obstacles between the selected locations. 
+     * @param selectedLocation the first location
+     * @param targetLocation the second location
+     * @return "true" if there are vertical obstacles, "false" if there are not.
+     */
+    private boolean areThereVerticalObstacles(BoardLocation selectedLocation, BoardLocation targetLocation)
     {
         int rowStart = selectedLocation.getRow();
         int colStart = selectedLocation.getColumn();
@@ -374,7 +417,13 @@ public class Game
         return true;
     }
     
-    private boolean areThereHorizontalObstacles(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation)
+    /**
+     * Determines if there are horizontal obstacles between the selected locations. 
+     * @param selectedLocation the first location
+     * @param targetLocation the second location
+     * @return "true" if there are horizontal obstacles, "false" if there are not.
+     */
+    private boolean areThereHorizontalObstacles(BoardLocation selectedLocation, BoardLocation targetLocation)
     {
         int rowStart = selectedLocation.getRow();
         int colStart = selectedLocation.getColumn();
@@ -439,7 +488,13 @@ public class Game
         return true;
     }
 
-    private boolean areThereDiagonalObstacles(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation)
+    /**
+     * Determines if there are diagonal obstacles between the selected locations. 
+     * @param selectedLocation the first location
+     * @param targetLocation the second location
+     * @return "true" if there are diagonal obstacles, "false" if there are not.
+     */
+    private boolean areThereDiagonalObstacles(BoardLocation selectedLocation, BoardLocation targetLocation)
     {
         int rowStart = selectedLocation.getRow();
         int colStart = selectedLocation.getColumn();
@@ -549,6 +604,12 @@ public class Game
         return false;
     }
     
+    /** 
+     * Auxiliary function to determine whether a Knight would threaten the specified square.
+     * @param start the Knight's location
+     * @param end the other square's location
+     * @return 
+     */
     private boolean doesKnightThreaten(BoardLocation start, BoardLocation end)
     {
         int rowStart = start.getRow();
@@ -562,9 +623,9 @@ public class Game
     }
     
     /** 
-     * Auxiliary 
-     * @param start
-     * @param end
+     * Auxiliary function to determine whether a King would threaten the specified square.
+     * @param start the King's location
+     * @param end the other square's location
      * @return 
      */
     private boolean doesKingThreaten(BoardLocation start, BoardLocation end)
@@ -615,7 +676,7 @@ public class Game
             // Update the turn counter and the turn indicator.
             this.UpdateTurn();
             return true;
-        }
+        } 
         else 
         {
             return false;
@@ -635,6 +696,12 @@ public class Game
         this.Moves.remove(move);
     }
 
+    /**
+     * Evaluate certain "special" moves, such as promoting a Pawn to a Queen.
+     * @param selectedLocation
+     * @param selectedPiece
+     * @param targetLocation 
+     */
     private void EvaluateSpecialMoves(BoardLocation selectedLocation, Piece selectedPiece, BoardLocation targetLocation)
     {
         // Check for pawn promotion.
@@ -651,10 +718,6 @@ public class Game
                 setPieceAt(targetLocation, new Queen(TeamColor.White));
             }
         }
-        
-        // Check for castling.
-        
-        // Check for en passant.
     }
     
     /**
@@ -745,7 +808,7 @@ public class Game
         
         return false;
     }
-        
+       
     /**
      * Returns the location of the specified color's King.
      * @param color the color whose king to check for. 

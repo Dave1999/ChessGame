@@ -5,10 +5,6 @@
  */
 package chessgame.models;
 
-import chessgame.exceptions.UnknownColorException;
-import chessgame.exceptions.UnknownTypeException;
-import chessgame.models.Piece.TeamColor;
-import chessgame.models.Piece.PieceType;
 import static chessgame.models.Piece.PieceTypeToString;
 import static chessgame.models.Piece.TeamColorToString;
 
@@ -18,13 +14,18 @@ import static chessgame.models.Piece.TeamColorToString;
  */
 public class Move 
 {
-    //private final TeamColor Team;
-    //private final PieceType Type; 
     private final BoardLocation StartLocation;
     private final BoardLocation EndLocation;
     private final Piece MovedPiece;
     private final Piece CapturedPiece;
     
+    /**
+     * Constructor for the Move class.
+     * @param movedPiece
+     * @param capturedPiece
+     * @param start
+     * @param end
+     */
     public Move(Piece movedPiece, Piece capturedPiece, BoardLocation start, BoardLocation end)
     {
         this.MovedPiece = movedPiece;
@@ -33,32 +34,56 @@ public class Move
         this.EndLocation = end;
     }
     
+    /**
+     * Returns the initial location of the moved piece.
+     * @return a BoardLocation holding the start location.
+     */
     public BoardLocation getStartLocation()
     {
         return this.StartLocation;
     }
     
+    /**
+     * Returns the ending location of the moved piece.
+     * @return a BoardLocation holding the end location.
+     */
     public BoardLocation getEndLocation()
     {
         return this.EndLocation;
     }
     
+    /**
+     * Returns the Piece to be moved during the Move.
+     * @return a Piece object holding the Piece that was moved.
+     */
     public Piece getMovedPiece()
     {
         return this.MovedPiece;
     }
     
+    /**
+     * Returns the Piece to be captured during the Move. This value is stored
+     * in case the move needs to be undone.
+     * @return a Piece object holding the Piece that was captured. 
+     */
     public Piece getCapturedPiece()
     {
         return this.CapturedPiece;
     }
     
+    /**
+     * Returns 'true' if a piece was captured as part of the move.
+     * @return
+     */
     public boolean wasPieceCaptured()
     {
         return this.CapturedPiece != null;
     }
     
     @Override
+    /**
+     * Returns a string version of the Move.
+     */
     public String toString()
     {
         String moveStr = "Moved " + TeamColorToString(this.MovedPiece.getColor()) + " " + 

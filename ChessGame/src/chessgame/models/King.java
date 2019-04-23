@@ -13,16 +13,26 @@ import static chessgame.models.Piece.PieceType.King;
  */
 public class King extends Piece 
 {
+
+    /**
+     * Constructor for the King class.
+     * @param color
+     */
     public King(TeamColor color) 
     {
         super(color);
         this.PieceType = King;
     }
     
-    /*
-    The King isMovePatternValid function returns true for the each tile 1 away from
-    the King either diagonal, forward,backward, or on each side.
-    */
+    /**
+     * The King isMovePatternValid function returns true for the each tile 1 away from
+     * the King either diagonal, forward,backward, or on each side.
+     * @param rowStart
+     * @param colStart
+     * @param rowEnd
+     * @param colEnd
+     * @return whether or not the move is valid.
+     */
     @Override
      public boolean isMovePatternValid(int rowStart, int colStart, int rowEnd, int colEnd)
      {

@@ -28,8 +28,7 @@ public class GameView extends StackPane implements IView
     private Game game;
     private boolean HasInitializedDisplay;
     
-    // This class extends StackPane, and displays a List of move. Display adds a Move object to the list,
-    // and displays it in the list-view.
+    /** */
     public GameView()
     {
         super();
@@ -55,7 +54,12 @@ public class GameView extends StackPane implements IView
         this.setMaxHeight(height);
     }
     
+    /**
+     *
+     */
     @Override
+    /**
+     * Display the game-status and update the list of moves. */
     public void Display()
     {    
         this.displayLastMove();
@@ -88,6 +92,9 @@ public class GameView extends StackPane implements IView
         }
     }
     
+    /** 
+     * Displays the previous move from the Game object. This is called from the Display() function.
+     */
     private void displayLastMove()
     {
         Move lastMove = game.getLastMove();
@@ -109,6 +116,10 @@ public class GameView extends StackPane implements IView
         }
     }
     
+    /**
+     * Returns the correct turn number string (such as 1a, 12b).
+     * @return 
+     */
     private String getTurnCountString()
     {
         String letter = "";
@@ -127,6 +138,10 @@ public class GameView extends StackPane implements IView
     }
     
     @Override 
+    /**
+     * Sets the Game object within the GameView class.
+     * @param chessGame
+     */
     public void SetGame(Game chessGame)
     {
         this.game = chessGame;

@@ -13,18 +13,30 @@ import static chessgame.models.Piece.PieceType.Knight;
  */
 public class Knight extends Piece 
 {
+
+    /**
+     * Constructor for the Knight class.
+     * @param color
+     */
     public Knight(TeamColor color) 
     {
         super(color);
         this.PieceType = Knight;
     }
     
-    /*
-    The Knight isMovePatternValid function is the same as the other subclasses and
-    intially checks to make sure their was not a false return from the intial checks
-    in Piece. The isMovePatternValid then goes through its move pattern checks for
-    the Knight piece and if any trigger true then the piece is able to move to that square.
-    */
+    /**
+     * The Knight isMovePatternValid function is the same as the other subclasses and
+     * initially checks to make sure their was not a false return from the intial checks
+     * in Piece. The isMovePatternValid then goes through its move pattern checks for
+     * the Knight piece and if any trigger true then the piece is able to move to that square.
+     *
+     * @param rowStart
+     * @param colStart
+     * @param rowEnd
+     * @param colEnd
+     * @return
+     */
+
     @Override
      public boolean isMovePatternValid(int rowStart, int colStart, int rowEnd, int colEnd)
      {
@@ -75,5 +87,4 @@ public class Knight extends Piece
         //If no flags trigger returns false
         else return false;
     }
-     //MAY STILL NEED LOGIC FOR TAKING A PIECE
 }

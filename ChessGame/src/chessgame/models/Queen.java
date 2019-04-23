@@ -11,6 +11,10 @@ package chessgame.models;
  */
 public class Queen extends Piece 
 {
+    /**
+     * Constructor for the Queen class.
+     * @param color
+     */
     public Queen(TeamColor color) 
     {
         super(color);
@@ -18,11 +22,16 @@ public class Queen extends Piece
     }
     
     /*
-    The Queen isMovePatternValid function returns true for the spaces that are within
-    the queens move pattern which is the Rook and Bishop's move pattern. The Queen
-    makes the same checks and the Rook and Bishop Pieces along with the intial checks from
-    Piece.
-    */
+     * The Queen isMovePatternValid function returns true for the spaces that are within
+     * the queens move pattern which is the Rook and Bishop's move pattern. The Queen
+     * makes the same checks and the Rook and Bishop Pieces along with the intial checks from
+     * Piece.
+     * @param rowStart
+     * @param colStart
+     * @param rowEnd
+     * @param colEnd
+     * @return
+     */
     @Override
     public boolean isMovePatternValid(int rowStart, int colStart, int rowEnd, int colEnd)
     {

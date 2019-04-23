@@ -31,6 +31,9 @@ public class ImageManager
     Image whitePawn;
     Image blackPawn;
     
+    /**
+     * Constructor for the ImageManager class. Initializes all the images from disk.
+     */
     public ImageManager() 
     {
         whiteKing = new Image(getClass().getResourceAsStream("/Images/White King.png"));
@@ -48,6 +51,12 @@ public class ImageManager
         blackPawn = new Image(getClass().getResourceAsStream("/Images/Black Pawn.png"));
     }
     
+    /**
+     * Returns the Image corresponding to the specified PieceType and PieceColor.
+     * @param pieceColor
+     * @param pieceType
+     * @return an Image object.
+     */
     public Image getImage(TeamColor pieceColor, PieceType pieceType) {
         
         switch(pieceType) {
@@ -119,6 +128,4 @@ public class ImageManager
         
         return null;
     }
-   
 }
-   

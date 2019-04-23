@@ -11,6 +11,11 @@ package chessgame.exceptions;
  */
 public class KingIsInCheckException extends RuntimeException 
 {
+
+    /**
+     *
+     * @param msg
+     */
     public KingIsInCheckException(String msg) 
     {
         super(msg);

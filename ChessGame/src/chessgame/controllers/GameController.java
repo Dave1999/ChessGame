@@ -70,6 +70,10 @@ public class GameController extends javafx.scene.layout.StackPane
     // Holds the currently selected BoardLocation (if the user has selected a piece).
     private BoardLocation selectedLocation;
     
+    /**
+     * Constructor for the GameController. It initializes all objects and initializes the Game object 
+     * for play.
+     */
     public GameController() 
     {
         super();
@@ -113,11 +117,9 @@ public class GameController extends javafx.scene.layout.StackPane
         this.game = new Game();
     }
     
-    public Game getGame()
-    {
-        return this.game;
-    }
-    
+    /**
+     * Creates the buttons that will go to the right-hand side of the gameboard.
+     */
     private void CreateControlButtons()
     {
         int width = 120;
@@ -157,25 +159,38 @@ public class GameController extends javafx.scene.layout.StackPane
         controlBox.getChildren().add(btnExitProgram);
     }
     
+    /** 
+     * Event handler for when btnResignGame is clicked.
+     * @param event 
+     */
     private void btnResignGame_Click(MouseEvent event)
     {
-        Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to resign the game? Have you checked all possible moves? Press OK to resign and start a new game, and press Cancel to return to the current game", ButtonType.OK, ButtonType.CANCEL);
+        Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to resign the current game? Have you checked all possible moves? Press OK to resign and start a new game, and press Cancel to return to the current game.", ButtonType.OK, ButtonType.CANCEL);
         alert.showAndWait();
 
         if (alert.getResult() == ButtonType.OK) 
         {
             String teamName = TeamColorToString(getOppositeColor(game.getTurnIndicator()));
             
+            // Show an informational message bo about which team won.
             String messageText = "The " + teamName + " team has won after " + game.getTurnCount() + " move(s)!";
             Alert secondAlert = new Alert(AlertType.INFORMATION, messageText, ButtonType.OK);
-            secondAlert.showAndWait();
+            secondAlert.showAndWait();          
+            
+            // Start a new game.
+            this.game.InitializeGameState();
+            this.Display();
         }
         else if (alert.getResult() == ButtonType.CANCEL)
         {
             alert.hide();
         }
     }
-    
+     
+    /** 
+     * Event handler for when btnNewGame is clicked.
+     * @param event 
+     */
     private void btnNewGame_Click(MouseEvent event)
     {
         Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to start a new game? Press OK to start a new game, and Cancel to resume the game.", ButtonType.OK, ButtonType.CANCEL);
@@ -192,6 +207,10 @@ public class GameController extends javafx.scene.layout.StackPane
         }
     }
         
+    /** 
+     * Event handler for when btnExitProgram is clicked.
+     * @param event 
+     */
     private void btnExitProgram_Click(MouseEvent event)
     {
         Alert alert = new Alert(AlertType.CONFIRMATION, "Are you sure you want to exit the program? Press OK to exit, and Cancel to resume the game.", ButtonType.OK, ButtonType.CANCEL);
@@ -209,7 +228,8 @@ public class GameController extends javafx.scene.layout.StackPane
     }
 
     /** 
-     * Event handler for the 
+     * Event handler for when a Button corresponding to one of the chessboard's 
+     * squares is clicked.
      * @param event 
      */
     public void PieceButton_Click(MouseEvent event)
@@ -278,6 +298,11 @@ public class GameController extends javafx.scene.layout.StackPane
         }
     }
     
+    /**
+     * Selects a location on the board within the GameController class. This location corresponds to the
+     * square that the user has selected.
+     * @param targetLocation 
+     */
     private void setSelectedLocation(BoardLocation targetLocation)
     {
         try
@@ -307,7 +332,10 @@ public class GameController extends javafx.scene.layout.StackPane
         }
     }
     
-    // Given a button object, this returns the row and column represented as a Point.
+    /**
+     * Given an individual Button in the GameController's array of piece-buttons, this function
+     * returns the row and column represented as a BoardLocation.
+     */
     private BoardLocation getButtonPosition(Button b)
     {
         BoardLocation location = null;
@@ -326,6 +354,12 @@ public class GameController extends javafx.scene.layout.StackPane
         return location;
     }
     
+    /**
+     * This function creates a new Button square on the chessboard.
+     * @param row the row in which the Button will be inserted
+     * @param column the column in which the Button will be inserted
+     * @return the Button object
+     */
     private Button createNewButton(int row, int column)
     {
         Button b = new Button();
@@ -341,7 +375,15 @@ public class GameController extends javafx.scene.layout.StackPane
         SetButtonStyle(b, row, column, "");
         return b;
     }
-    
+   
+    /**
+     * This function sets the style of a board-piece Button, based on the row, column,
+     * and the desired highlight color.
+     * @param b the Button object
+     * @param row the row within the chessboard
+     * @param column the column within the chessboard
+     * @param borderColor the desired border color
+     */
     private void SetButtonStyle(Button b, int row, int column, String borderColor)
     {
         String style = "-fx-background-color: ";
@@ -367,7 +409,12 @@ public class GameController extends javafx.scene.layout.StackPane
         
         b.setStyle(style);
     }
-    
+  
+    /**
+     * Loads an ImageView into the specified Button.
+     * @param button
+     * @param img 
+     */
     private void loadImageView(Button button, Image img)
     {
         // Create a new ImageView from the correct image based on the Piece's type and color.
@@ -380,7 +427,12 @@ public class GameController extends javafx.scene.layout.StackPane
         button.setGraphic(imageView);
     }
     
-    // Returns 'true' if the specified square is white, and 'false' if the square is black.
+    /**
+     * Returns 'true' if the specified square is white, and 'false' if the square is black.
+     * @param row the specified square's row
+     * @param column the specified square's column
+     * @return 
+     */
     private boolean getSquareColor(int row, int column)
     {
         boolean isWhiteSquare;
@@ -399,6 +451,10 @@ public class GameController extends javafx.scene.layout.StackPane
         return isWhiteSquare;
     }    
     
+    /**
+     * Sets the GameController's View object.
+     * @param view an object that inherits from the IVIew interface.
+     */
     public void setView(IView view)
     {
         this.view = view;

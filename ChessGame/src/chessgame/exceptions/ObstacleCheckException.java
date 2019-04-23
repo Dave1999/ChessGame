@@ -11,6 +11,11 @@ package chessgame.exceptions;
  */
 public class ObstacleCheckException extends RuntimeException 
 {
+
+    /**
+     *
+     * @param msg
+     */
     public ObstacleCheckException(String msg) 
     {
         super(msg);

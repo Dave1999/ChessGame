@@ -11,6 +11,11 @@ package chessgame.exceptions;
  */
 public class InvalidMoveException extends RuntimeException 
 {
+
+    /**
+     *
+     * @param msg
+     */
     public InvalidMoveException(String msg) 
     {
         super(msg);

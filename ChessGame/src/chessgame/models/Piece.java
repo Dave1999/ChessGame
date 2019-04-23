@@ -16,46 +16,73 @@ public class Piece
 {
     public enum PieceType
     {
-        Rook, Bishop, King, Queen, Pawn, Knight
+        Rook,
+        Bishop,
+        King,
+        Queen,
+        Pawn,
+        Knight
     }
      
     public enum TeamColor
     {
-       Black, White
+        Black,
+        White
     }
      
     protected PieceType PieceType;  
     protected TeamColor PieceColor;
      
+    /**
+     * Constructor for the Piece class.
+     * @param color
+     */
     public Piece(TeamColor color)
     {
         PieceColor = color;
     }
      
+    /**
+     * Alternate constructor for the Piece class.
+     * @param pieceType
+     * @param color
+     */
     public Piece(PieceType pieceType, TeamColor color)
     {
         PieceType = pieceType;
         PieceColor = color;
     }
     
-    // Returns the Color of the Piece
+    /**
+     * Returns the Color of the Piece
+     * @return a TeamColor object.
+     */
     public TeamColor getColor()
     {
         return PieceColor;
     }
-    
-    //Returns the Piece Type
+
+    /**
+     * Returns the Type of the Piece
+     * @return a PieceType object.
+     */
     public PieceType getType()
     {
          return PieceType;
     }
     
-    /*The is MoveValidPattern function present in Piece makes some intial checks
-    to make sure the piece is not trying to move to its current space or it is not
-    trying to move to a space that is out of bounds.The isMovePatternValid takes an
-    input of the current location of the piece in two coordinates the row and col
-    along with the ending location in two coordinates for row and column.
-    */
+    /**
+     * The is MoveValidPattern function present in Piece makes some initial checks
+     * to make sure the piece is not trying to move to its current space or it is not
+     * trying to move to a space that is out of bounds.The isMovePatternValid takes an
+     * input of the current location of the piece in two coordinates the row and col
+     * along with the ending location in two coordinates for row and column.
+     * @param rowStart
+     * @param colStart
+     * @param rowEnd
+     * @param colEnd
+     * @return
+     */
     public boolean isMovePatternValid(int rowStart, int colStart, int rowEnd, int colEnd)
     {
         if((rowStart == rowEnd) && (colStart == colEnd))
@@ -72,6 +99,11 @@ public class Piece
         }
     }
     
+    /**
+     * Converts a TeamColor to a String.
+     * @param color
+     * @return the String representation of that color.
+     */
     public static String TeamColorToString(TeamColor color)
     {
         switch (color)
@@ -85,6 +117,11 @@ public class Piece
         }
     }
     
+    /**
+     * Converts a PieceType to a String.
+     * @param type
+     * @return the String representation of that PieceType.
+     */
     public static String PieceTypeToString(PieceType type)
     {
         switch (type)

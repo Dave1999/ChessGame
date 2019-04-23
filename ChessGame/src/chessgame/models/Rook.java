@@ -11,6 +11,10 @@ package chessgame.models;
  */
 public class Rook extends Piece {
 
+    /**
+     * Constructor for the Rook class.
+     * @param color
+     */
     public Rook(TeamColor color)
     {
         super(color);
@@ -18,10 +22,15 @@ public class Rook extends Piece {
     }
     
     /*
-    The Rook isMovePatternValid check only checks to make sure the End Location
-    is in the same row or the same column as the starting location and also checks
-    the intial checks from Piece.
-    */
+     * The Rook isMovePatternValid check only checks to make sure the End Location
+     * is in the same row or the same column as the starting location and also checks
+     * the intial checks from Piece.
+     * @param rowStart
+     * @param colStart
+     * @param rowEnd
+     * @param colEnd
+     * @return true if the pattern is valid, false if it is not.
+     */
     @Override
     public boolean isMovePatternValid(int rowStart, int colStart, int rowEnd, int colEnd)
     {

@@ -12,6 +12,15 @@ package chessgame.views;
  */
 public interface IView 
 {
+
+    /**
+     *
+     * @param g
+     */
     public void SetGame(chessgame.models.Game g);
+
+    /**
+     *
+     */
     public void Display();
 }

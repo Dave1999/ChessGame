@@ -11,6 +11,11 @@ package chessgame.exceptions;
  */
 public class UnknownTypeException extends RuntimeException 
 {
+
+    /**
+     *
+     * @param msg
+     */
     public UnknownTypeException(String msg) 
     {
         super(msg);

@@ -11,6 +11,11 @@ package chessgame.exceptions;
  */
 public class BoardLocationException extends RuntimeException 
 {
+
+    /**
+     *
+     * @param msg
+     */
     public BoardLocationException(String msg) 
     {
         super(msg);

@@ -11,6 +11,11 @@ package chessgame.exceptions;
  */
 public class WrongTurnException extends Exception 
 {
+
+    /**
+     *
+     * @param msg
+     */
     public WrongTurnException(String msg) 
     {
         super(msg);

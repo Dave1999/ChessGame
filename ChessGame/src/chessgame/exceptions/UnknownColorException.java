@@ -11,6 +11,11 @@ package chessgame.exceptions;
  */
 public class UnknownColorException extends RuntimeException 
 {
+
+    /**
+     *
+     * @param msg
+     */
     public UnknownColorException(String msg) 
     {
         super(msg);
